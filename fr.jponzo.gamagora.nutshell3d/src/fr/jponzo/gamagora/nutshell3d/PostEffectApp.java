@@ -41,7 +41,6 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
-//Test commit 2
 public class PostEffectApp {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static final String RES_FOLDER_PATH = "D:\\JavaWorkspaces\\nutshell3dWorkspace\\fr.jponzo.gamagora.nutshell3d\\resources\\";
