@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.jponzo.gamagora.nutshell3d.rendering.RenderingSystem;
+import net.java.games.input.Controller;
+import net.java.games.input.ControllerEnvironment;
 
 public class InputManager {
 	private static class SingletonWrapper {
@@ -62,7 +64,7 @@ public class InputManager {
 					pendingKeyUpMap.put(key, true);
 				}
 			}
-			
+
 			@Override
 			public void mousePressed(MouseEvent e) {
 				KeyCode key = getKeyCodeFromAWTMouseButtonNumber(e.getButton());
@@ -74,7 +76,7 @@ public class InputManager {
 				}
 			}
 		});
-		
+
 		synchronized (keyMap) {
 			synchronized (keyUpMap) {
 				synchronized (keyDownMap) {
@@ -206,7 +208,7 @@ public class InputManager {
 		}
 		return null;
 	}
-	
+
 	private KeyCode getKeyCodeFromAWTMouseButtonNumber(int button) {
 		switch (button) {
 		case 1:
