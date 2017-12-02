@@ -42,13 +42,13 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
+import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class MGTP4App {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static final String RES_FOLDER_PATH = "D:\\Tools\\workspaces\\nutshell3dWorkspace\\fr.jponzo.gamagora.nutshell3d\\resources\\";
 	private static int width = 800;
 	private static int height = 600;
 
@@ -125,8 +125,8 @@ public class MGTP4App {
 				);
 		camera.setOrtho(false);
 		IMaterial camMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
-				RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
@@ -215,8 +215,8 @@ public class MGTP4App {
 	private static void createMeshes(IEntity rootEntity) throws OperationNotSupportedException {
 		ITransform transform;
 		IMaterial meshMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicLight.vert", 
-				RES_FOLDER_PATH + "shaders\\basicLight.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.frag");
 		meshMat.setVec3Param("mat_diffuseColor", 0.5f, 0.5f, 0.5f);
 
 		//Create Triceratops Mesh
@@ -224,7 +224,7 @@ public class MGTP4App {
 		transform = new Transform(triceratopsEntity);
 		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
 		IMeshDef triceratopsMeshDef = new MutableMeshDef();
-		triceratopsMeshDef.setPath(RES_FOLDER_PATH + "meshes\\triceratops.off");
+		triceratopsMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\triceratops.off");
 		triceratopsMeshDef.load();
 		IMesh triceratopsMesh = new Mesh(triceratopsEntity, triceratopsMeshDef);
 		triceratopsMesh.setMaterial(meshMat);
@@ -250,7 +250,7 @@ public class MGTP4App {
 		transform = new Transform(buddhaEntity);
 		transform.setLocalTranslate(Matrices.translation(1f, -1f, -1f));
 		IMeshDef buddhaMeshDef = new MutableMeshDef();
-		buddhaMeshDef.setPath(RES_FOLDER_PATH + "meshes\\buddha.off");
+		buddhaMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\buddha.off");
 		buddhaMeshDef.load();
 		IMesh buddhaMesh = new Mesh(buddhaEntity, buddhaMeshDef);
 		rootEntity.addChild(buddhaEntity);
@@ -276,8 +276,8 @@ public class MGTP4App {
 		transform = new Transform(bunnyEntity);
 		transform.setLocalTranslate(Matrices.translation(1f, 1f, -1f));
 		IMeshDef bunnyMeshDef = new MutableMeshDef();
-		bunnyMeshDef.setPath(RES_FOLDER_PATH + "meshes\\bunny.off");
-//		bunnyMeshDef.setPath(RES_FOLDER_PATH + "meshes\\brokenRabbit.off");
+		bunnyMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\bunny.off");
+//		bunnyMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\brokenRabbit.off");
 		bunnyMeshDef.load();
 		IMesh bunnyMesh = new Mesh(bunnyEntity, bunnyMeshDef);
 		rootEntity.addChild(bunnyEntity);
@@ -316,7 +316,7 @@ public class MGTP4App {
 			}
 
 			private void saveRabbit(MutableMeshDef mesh) {
-				File savedRabbit = new File(RES_FOLDER_PATH + "meshes\\brokenRabbit.off");
+				File savedRabbit = new File(IOUtils.RES_FOLDER_PATH + "meshes\\brokenRabbit.off");
 				try {
 					BufferedWriter bw = new BufferedWriter(new FileWriter(savedRabbit));
 					//Header
@@ -352,7 +352,7 @@ public class MGTP4App {
 		transform = new Transform(maxEntity);
 		transform.setLocalTranslate(Matrices.translation(-1f, 1f, -1f));
 		IMeshDef maxMeshDef = new MutableMeshDef();
-		maxMeshDef.setPath(RES_FOLDER_PATH + "meshes\\max.off");
+		maxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\max.off");
 		maxMeshDef.load();
 		IMesh maxMesh = new Mesh(maxEntity, maxMeshDef);
 		rootEntity.addChild(maxEntity);
@@ -391,13 +391,13 @@ public class MGTP4App {
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
 		IMeshDef wallMeshDef = new MeshDef();
-		wallMeshDef.setPath(RES_FOLDER_PATH + "meshes\\square.mesh.csv");
+		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
 		wallMeshDef.load();
 		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
 		roomrEntity.addChild(floorEntity);
 		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
 		floorMesh.setMaterial(floorMat);
 
@@ -410,8 +410,8 @@ public class MGTP4App {
 		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
 		roomrEntity.addChild(roofEntity);
 		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
 		roofMesh.setMaterial(roofMat);
 
@@ -423,8 +423,8 @@ public class MGTP4App {
 		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
 		roomrEntity.addChild(fWallEntity);
 		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
 		fWallMesh.setMaterial(fWallMat);
 
@@ -436,8 +436,8 @@ public class MGTP4App {
 		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
 		roomrEntity.addChild(bWallEntity);
 		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
 		bWallMesh.setMaterial(bWallMat);
 
@@ -450,8 +450,8 @@ public class MGTP4App {
 		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
 		roomrEntity.addChild(lWallEntity);
 		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
 		lWallMesh.setMaterial(lWallMat);
 
@@ -464,8 +464,8 @@ public class MGTP4App {
 		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
 		roomrEntity.addChild(rWallEntity);
 		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
 

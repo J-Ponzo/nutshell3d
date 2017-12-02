@@ -10,8 +10,6 @@ import java.awt.event.WindowEvent;
 
 import javax.naming.OperationNotSupportedException;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
@@ -37,13 +35,13 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
+import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class CamLayersApp {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static final String RES_FOLDER_PATH = "D:\\JavaWorkspaces\\nutshell3dWorkspace\\fr.jponzo.gamagora.nutshell3d\\resources\\";
 	private static int width = 800;
 	private static int height = 600;
 
@@ -121,8 +119,8 @@ public class CamLayersApp {
 				);
 		camera.setOrtho(false);
 		IMaterial camMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
-				RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
@@ -210,16 +208,16 @@ public class CamLayersApp {
 		transform.setLocalTranslate(Matrices.translation(1f, 0f, -1f));
 		transform.setLocalScale(Matrices.scale(2f, 2f, 2f));
 		IMeshDef shipMeshDef = new MeshDef();
-		shipMeshDef.setPath(RES_FOLDER_PATH + "meshes\\Drone.obj");
+		shipMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Drone.obj");
 		shipMeshDef.load();
 		IMesh shipMesh = new Mesh(shipEntity, shipMeshDef);
 		rootEntity.addChild(shipEntity);
 		IMaterial shipMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
-		ITexture shipDiffTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Drone_D.png");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
+		ITexture shipDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Drone_D.png");
 		shipMat.setTexParam("mat_diffTexture", shipDiffTex);
-		ITexture shipNormalTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Drone_N.png");
+		ITexture shipNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Drone_N.png");
 		shipMat.setTexParam("mat_normTexture", shipNormalTex);
 		shipMesh.setMaterial(shipMat);
 
@@ -228,16 +226,16 @@ public class CamLayersApp {
 		transform = new Transform(boxEntity);
 		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
 		IMeshDef boxMeshDef = new MeshDef();
-		boxMeshDef.setPath(RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
+		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
 		boxMeshDef.load();
 		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
 		rootEntity.addChild(boxEntity);
 		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
-		ITexture boxDiffTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
+		ITexture boxDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
 		boxMat.setTexParam("mat_diffTexture", boxDiffTex);
-		ITexture boxNormalTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
+		ITexture boxNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
 		boxMat.setTexParam("mat_normTexture", boxNormalTex);
 		boxMesh.setMaterial(boxMat);
 		new AbstractUpdator(boxEntity) {
@@ -276,13 +274,13 @@ public class CamLayersApp {
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
 		IMeshDef wallMeshDef = new MeshDef();
-		wallMeshDef.setPath(RES_FOLDER_PATH + "meshes\\square.mesh.csv");
+		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
 		wallMeshDef.load();
 		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
 		roomrEntity.addChild(floorEntity);
 		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
 		floorMesh.setMaterial(floorMat);
 
@@ -295,8 +293,8 @@ public class CamLayersApp {
 		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
 		roomrEntity.addChild(roofEntity);
 		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
 		roofMesh.setMaterial(roofMat);
 
@@ -308,8 +306,8 @@ public class CamLayersApp {
 		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
 		roomrEntity.addChild(fWallEntity);
 		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
 		fWallMesh.setMaterial(fWallMat);
 
@@ -321,8 +319,8 @@ public class CamLayersApp {
 		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
 		roomrEntity.addChild(bWallEntity);
 		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
 		bWallMesh.setMaterial(bWallMat);
 
@@ -335,8 +333,8 @@ public class CamLayersApp {
 		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
 		roomrEntity.addChild(lWallEntity);
 		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
 		lWallMesh.setMaterial(lWallMat);
 
@@ -349,8 +347,8 @@ public class CamLayersApp {
 		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
 		roomrEntity.addChild(rWallEntity);
 		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
 

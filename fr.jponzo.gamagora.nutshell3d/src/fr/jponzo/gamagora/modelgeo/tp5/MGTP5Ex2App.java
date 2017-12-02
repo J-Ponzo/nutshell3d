@@ -7,13 +7,11 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Random;
 
 import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.awt.GLCanvas;
 
-import fr.jponzo.gamagora.modelgeo.tp4.MutableMeshDef;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
 import fr.jponzo.gamagora.nutshell3d.input.KeyCode;
 import fr.jponzo.gamagora.nutshell3d.material.impl.MaterialManager;
@@ -36,13 +34,13 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
+import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class MGTP5Ex2App {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static final String RES_FOLDER_PATH = "D:\\Tools\\workspaces\\nutshell3dWorkspace\\fr.jponzo.gamagora.nutshell3d\\resources\\";
 	private static int width = 800;
 	private static int height = 600;
 
@@ -119,8 +117,8 @@ public class MGTP5Ex2App {
 				);
 		camera.setOrtho(false);
 		IMaterial camMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
-				RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
@@ -220,8 +218,8 @@ public class MGTP5Ex2App {
 		curve.setDiscrtisation(10);
 		curve.updateFromControl();
 		IMaterial curvMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		curvMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
 		curve.setMaterial(curvMat);
 		rootEntity.addChild(curveEntity);
@@ -320,13 +318,13 @@ public class MGTP5Ex2App {
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
 		IMeshDef wallMeshDef = new MeshDef();
-		wallMeshDef.setPath(RES_FOLDER_PATH + "meshes\\square.mesh.csv");
+		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
 		wallMeshDef.load();
 		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
 		roomrEntity.addChild(floorEntity);
 		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
 		floorMesh.setMaterial(floorMat);
 
@@ -339,8 +337,8 @@ public class MGTP5Ex2App {
 		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
 		roomrEntity.addChild(roofEntity);
 		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
 		roofMesh.setMaterial(roofMat);
 
@@ -352,8 +350,8 @@ public class MGTP5Ex2App {
 		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
 		roomrEntity.addChild(fWallEntity);
 		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
 		fWallMesh.setMaterial(fWallMat);
 
@@ -365,8 +363,8 @@ public class MGTP5Ex2App {
 		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
 		roomrEntity.addChild(bWallEntity);
 		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
 		bWallMesh.setMaterial(bWallMat);
 
@@ -379,8 +377,8 @@ public class MGTP5Ex2App {
 		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
 		roomrEntity.addChild(lWallEntity);
 		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
 		lWallMesh.setMaterial(lWallMat);
 
@@ -393,8 +391,8 @@ public class MGTP5Ex2App {
 		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
 		roomrEntity.addChild(rWallEntity);
 		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
 

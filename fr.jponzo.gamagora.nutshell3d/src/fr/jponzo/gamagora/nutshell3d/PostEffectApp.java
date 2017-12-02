@@ -10,8 +10,6 @@ import java.awt.event.WindowEvent;
 
 import javax.naming.OperationNotSupportedException;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
@@ -28,22 +26,20 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Entity;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Light;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
-import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
-import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
+import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class PostEffectApp {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static final String RES_FOLDER_PATH = "D:\\JavaWorkspaces\\nutshell3dWorkspace\\fr.jponzo.gamagora.nutshell3d\\resources\\";
 	private static int width = 800;
 	private static int height = 600;
 
@@ -121,8 +117,8 @@ public class PostEffectApp {
 				);
 		camera.setOrtho(false);
 		IMaterial camMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
-				RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
@@ -209,16 +205,16 @@ public class PostEffectApp {
 		transform = new Transform(boxEntity);
 		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
 		IMeshDef boxMeshDef = new MeshDef();
-		boxMeshDef.setPath(RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
+		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
 		boxMeshDef.load();
 		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
 		rootEntity.addChild(boxEntity);
 		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
-		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
+		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
 		boxMat.setTexParam("mat_diffTexture", nutDiffTex);
-		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
+		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
 		boxMat.setTexParam("mat_normTexture", nutNormalTex);
 		boxMesh.setMaterial(boxMat);
 		new AbstractUpdator(boxEntity) {
@@ -257,13 +253,13 @@ public class PostEffectApp {
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
 		IMeshDef wallMeshDef = new MeshDef();
-		wallMeshDef.setPath(RES_FOLDER_PATH + "meshes\\square.mesh.csv");
+		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
 		wallMeshDef.load();
 		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
 		roomrEntity.addChild(floorEntity);
 		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
 		floorMesh.setMaterial(floorMat);
 
@@ -276,8 +272,8 @@ public class PostEffectApp {
 		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
 		roomrEntity.addChild(roofEntity);
 		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
 		roofMesh.setMaterial(roofMat);
 
@@ -289,8 +285,8 @@ public class PostEffectApp {
 		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
 		roomrEntity.addChild(fWallEntity);
 		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
 		fWallMesh.setMaterial(fWallMat);
 
@@ -302,8 +298,8 @@ public class PostEffectApp {
 		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
 		roomrEntity.addChild(bWallEntity);
 		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
 		bWallMesh.setMaterial(bWallMat);
 
@@ -316,8 +312,8 @@ public class PostEffectApp {
 		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
 		roomrEntity.addChild(lWallEntity);
 		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
 		lWallMesh.setMaterial(lWallMat);
 
@@ -330,8 +326,8 @@ public class PostEffectApp {
 		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
 		roomrEntity.addChild(rWallEntity);
 		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
 	}

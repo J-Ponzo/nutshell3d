@@ -10,8 +10,6 @@ import java.awt.event.WindowEvent;
 
 import javax.naming.OperationNotSupportedException;
 
-import com.jogamp.opengl.GLCapabilities;
-import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
@@ -28,22 +26,20 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Entity;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Light;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
-import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
-import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
+import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class TransformApp {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static final String RES_FOLDER_PATH = "D:\\JavaWorkspaces\\nutshell3dWorkspace\\fr.jponzo.gamagora.nutshell3d\\resources\\";
 	private static int width = 800;
 	private static int height = 600;
 
@@ -121,8 +117,8 @@ public class TransformApp {
 				);
 		camera.setOrtho(false);
 		IMaterial camMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
-				RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
@@ -204,13 +200,13 @@ public class TransformApp {
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(5f, 5f, 1f));
 		IMeshDef floorMeshDef = new MeshDef();
-		floorMeshDef.setPath(RES_FOLDER_PATH + "meshes\\square.mesh.csv");
+		floorMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
 		floorMeshDef.load();
 		IMesh mirrorMesh = new Mesh(floorEntity, floorMeshDef);
 		rootEntity.addChild(floorEntity);
 		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				RES_FOLDER_PATH + "shaders\\\\basicColor.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\\\basicColor.frag");
 		mirrorMat.setVec3Param("mat_color", 1f, 1f, 0f);
 		mirrorMesh.setMaterial(mirrorMat);
 
@@ -218,16 +214,16 @@ public class TransformApp {
 		IEntity boxEntity = new Entity();
 		transform = new Transform(boxEntity);
 		IMeshDef boxMeshDef = new MeshDef();
-		boxMeshDef.setPath(RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
+		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
 		boxMeshDef.load();
 		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
 		rootEntity.addChild(boxEntity);
 		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
-				RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
-				RES_FOLDER_PATH + "shaders\\\\basicLightTexNorm.frag");
-		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\\\basicLightTexNorm.frag");
+		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
 		boxMat.setTexParam("mat_diffTexture", nutDiffTex);
-		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
+		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
 		boxMat.setTexParam("mat_normTexture", nutNormalTex);
 		boxMesh.setMaterial(boxMat);
 		new AbstractUpdator(boxEntity) {
