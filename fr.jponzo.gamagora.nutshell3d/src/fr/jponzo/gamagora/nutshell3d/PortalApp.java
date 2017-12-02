@@ -27,6 +27,7 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Light;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
+import fr.jponzo.gamagora.nutshell3d.scene.impl.Portal;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
@@ -34,13 +35,14 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
+import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IPortal;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
 import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
-public class MirrorApp {
+public class PortalApp {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
@@ -104,7 +106,6 @@ public class MirrorApp {
 		SceneManager.getInstance().setRoot(rootEntity);
 
 		//Create Camera
-
 		IEntity cameraEntity = new Entity();
 		transform = new Transform(cameraEntity);
 		transform.setLocalTranslate(Matrices.translation(0f, 0.5f, -3f));
@@ -124,7 +125,7 @@ public class MirrorApp {
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
-			private float moveSpeed = 4f;
+			private float moveSpeed = 2f;
 			private float rotSpeed = (float) Math.PI / 3f;
 
 			@Override
@@ -205,7 +206,7 @@ public class MirrorApp {
 		//Create Box Mesh
 		IEntity boxEntity = new Entity();
 		transform = new Transform(boxEntity);
-		transform.setLocalTranslate(Matrices.translation(-2f, -2f, -2f));
+		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
 		IMeshDef boxMeshDef = new MeshDef();
 		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
 		boxMeshDef.load();
@@ -251,9 +252,9 @@ public class MirrorApp {
 		//Create Floor
 		IEntity floorEntity = new Entity();
 		transform = new Transform(floorEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, -5f, 0f));
+		transform.setLocalTranslate(Matrices.translation(0f, -15f, 0f));
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		transform.setLocalScale(Matrices.scale(20f, 20f, 1f));
 		IMeshDef wallMeshDef = new MeshDef();
 		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
 		wallMeshDef.load();
@@ -268,9 +269,9 @@ public class MirrorApp {
 		//Create roof
 		IEntity roofEntity = new Entity();
 		transform = new Transform(roofEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 5f, 0f));
+		transform.setLocalTranslate(Matrices.translation(0f, 15f, 0f));
 		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		transform.setLocalScale(Matrices.scale(20f, 20f, 1f));
 		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
 		roomrEntity.addChild(roofEntity);
 		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
@@ -282,8 +283,8 @@ public class MirrorApp {
 		//Create front wall
 		IEntity fWallEntity = new Entity();
 		transform = new Transform(fWallEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 5f));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, 15f));
+		transform.setLocalScale(Matrices.scale(20f, 20f, 1f));
 		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
 		roomrEntity.addChild(fWallEntity);
 		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
@@ -295,8 +296,8 @@ public class MirrorApp {
 		//Create back wall
 		IEntity bWallEntity = new Entity();
 		transform = new Transform(bWallEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, -5f));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, -15f));
+		transform.setLocalScale(Matrices.scale(20f, 20f, 1f));
 		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
 		roomrEntity.addChild(bWallEntity);
 		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
@@ -308,9 +309,9 @@ public class MirrorApp {
 		//Create left wall
 		IEntity lWallEntity = new Entity();
 		transform = new Transform(lWallEntity);
-		transform.setLocalTranslate(Matrices.translation(5f, 0f, 0f));
+		transform.setLocalTranslate(Matrices.translation(15f, 0f, 0f));
 		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		transform.setLocalScale(Matrices.scale(20f, 20f, 1f));
 		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
 		roomrEntity.addChild(lWallEntity);
 		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
@@ -322,9 +323,9 @@ public class MirrorApp {
 		//Create right wall
 		IEntity rWallEntity = new Entity();
 		transform = new Transform(rWallEntity);
-		transform.setLocalTranslate(Matrices.translation(-5f, 0f, 0f));
+		transform.setLocalTranslate(Matrices.translation(-15f, 0f, 0f));
 		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		transform.setLocalScale(Matrices.scale(20f, 20f, 1f));
 		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
 		roomrEntity.addChild(rWallEntity);
 		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
@@ -333,18 +334,50 @@ public class MirrorApp {
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
 
-		//Create mirrors
+		//Create Portal 1
+		IEntity portal1Entity = new Entity();
+		transform = new Transform(portal1Entity);
+		transform.setLocalTranslate(Matrices.translation(1f, -2f, 1f));
+		transform.setLocalRotate(Matrices.zRotation((float) (Math.PI / 4)));
+		transform.setLocalScale(Matrices.scale(3f, 3f, 1f));
+		IMesh portal1Mesh = new Mesh(portal1Entity, wallMeshDef);
+		roomrEntity.addChild(portal1Entity);
+		IMaterial portalWallMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		portalWallMat.setVec3Param("mat_color", 0.5f, 0.5f, 0.5f);
+		portal1Mesh.setMaterial(portalWallMat);
+
+		//Create Portal 2
+		IEntity portal2Entity = new Entity();
+		transform = new Transform(portal2Entity);
+		transform.setLocalTranslate(Matrices.translation(-1f, -2f, -1f));
+		transform.setLocalRotate(Matrices.yRotation((float) (3 * Math.PI / 2)));
+		transform.setLocalScale(Matrices.scale(3f, 3f, 1f));
+		IMesh portal2Mesh = new Mesh(portal2Entity, wallMeshDef);
+		roomrEntity.addChild(portal2Entity);
+		portal2Mesh.setMaterial(portalWallMat);
+
+		//Set portals
+		IMaterial portalMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\portalPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\portalPostEffect.frag");
+
+		IPortal portal1 = new Portal(portal1Entity);
+		portal1.setMaterial(portalMat);
+
+		IPortal portal2 = new Portal(portal2Entity);
+		portal2.setMaterial(portalMat);
+		
+		portal1.setTarget(portal2);
+		portal2.setTarget(portal1);
+
+		//Set mirrors
 		IMirror mirror = null;
 		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
-		
-		mirror = new Mirror(lWallEntity);
-		mirror.setMaterial(mirrorMat);
-		
-		mirror = new Mirror(bWallEntity);
-		mirror.setMaterial(mirrorMat);
-		
+
 		mirror = new Mirror(roofEntity);
 		mirror.setMaterial(mirrorMat);
 	}

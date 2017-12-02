@@ -131,10 +131,6 @@ public class Transform extends AbstractComponent implements ITransform {
 		localTransform = localTransform.multiply(localTranslate);
 		localTransform = localTransform.multiply(localRotate);
 		localTransform = localTransform.multiply(localScale);
-		
-//		localTransform = localTransform.multiply(localScale);
-//		localTransform = localTransform.multiply(localRotate);
-//		localTransform = localTransform.multiply(localTranslate);
 	}
 
 	/**

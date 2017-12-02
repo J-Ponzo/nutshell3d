@@ -11,6 +11,8 @@ public interface IEntity {
 	IComponent getComponent(int index);
 	
 	List<IMirror> getMirrors();	
+	
+	List<IPortal> getPortals();
 
 	List<ICamera> getCameras();
 

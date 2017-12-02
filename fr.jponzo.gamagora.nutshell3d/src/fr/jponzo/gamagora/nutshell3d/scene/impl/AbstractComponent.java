@@ -10,5 +10,10 @@ public abstract class AbstractComponent implements IComponent {
 		super();
 		this.entity = entity;
 		this.entity.addComponent(this);
+	}
+
+	@Override
+	public IEntity getEntity() {
+		return entity;
 	}	
 }

@@ -10,6 +10,7 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
+import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IPortal;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IUpdator;
 
@@ -34,6 +35,17 @@ public class Entity implements IEntity {
 		for (IComponent component : components) {
 			if (component instanceof IMirror) {
 				componentsList.add((IMirror) component);
+			}
+		}
+		return componentsList;
+	}
+	
+	@Override
+	public List<IPortal> getPortals() {
+		List<IPortal> componentsList = new ArrayList<IPortal>();
+		for (IComponent component : components) {
+			if (component instanceof IPortal) {
+				componentsList.add((IPortal) component);
 			}
 		}
 		return componentsList;

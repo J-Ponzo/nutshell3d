@@ -27,6 +27,7 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
+import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IPortal;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
@@ -63,6 +64,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 	private List<IEntity> cameraQueue = new ArrayList<IEntity>();
 	private List<IEntity> lightQueue = new ArrayList<IEntity>();
 	private List<IEntity> mirrorQueue = new ArrayList<IEntity>();
+	private List<IEntity> portalQueue = new ArrayList<IEntity>();
 	private List<IEntity> curveQueue = new ArrayList<IEntity>();
 
 	private boolean debug = true;
@@ -79,6 +81,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		lightQueue.clear();
 		cameraQueue.clear();
 		mirrorQueue.clear();
+		portalQueue.clear();
 		curveQueue.clear();
 		updateRenderingQueues(root);
 		this.glcanvas.display();
@@ -94,7 +97,9 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 		//Processing current Entity
 		//look for a mesh component
-		if (entity.getMeshes().size() > 0 && entity.getMirrors().size() == 0) {
+		if (entity.getMeshes().size() > 0 
+				&& entity.getMirrors().size() == 0
+				&& entity.getPortals().size() == 0) {
 			meshQueue.add(entity);
 		}
 		if (entity.getLights().size() > 0) {
@@ -105,6 +110,9 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		}
 		if (entity.getMirrors().size() > 0) {
 			mirrorQueue.add(entity);
+		}
+		if (entity.getPortals().size() > 0) {
+			portalQueue.add(entity);
 		}
 		if (entity.getCurves().size() > 0) {
 			curveQueue.add(entity);
@@ -181,6 +189,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			gl.glStencilMask(0xFF);
 			gl.glEnable(GL4.GL_STENCIL_TEST);
 			
+			//Mirrors Rendering
 			//Init stencil
 			gl.glClear(GL4.GL_STENCIL_BUFFER_BIT);
 			gl.glStencilOp(GL4.GL_KEEP, GL4.GL_KEEP, GL4.GL_REPLACE);
@@ -208,6 +217,37 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
 				postEffectRendering(gl, mirrorCam, osTex[1]);
+				gl.glDepthMask(true);
+			}
+			
+			//Portals Rendering
+			//Init stencil
+			gl.glClear(GL4.GL_STENCIL_BUFFER_BIT);
+			gl.glStencilOp(GL4.GL_KEEP, GL4.GL_KEEP, GL4.GL_REPLACE);
+			for (int i = 0; i < portalQueue.size(); i++) {
+				gl.glStencilFunc(GL4.GL_ALWAYS, i + 1, 0xFF);
+				IEntity portalEntity = portalQueue.get(i);
+				portalRenderingPass(gl, camera, portalEntity);
+			}
+			
+			for (int i = 0; i < portalQueue.size(); i++) {
+				//Draw mirror content on fb1
+				gl.glViewport(0, 0, 800, 600);
+				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
+				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
+				ICamera portalCam = createPortalCam(portalQueue.get(i), cameraEntity);
+				gl.glDisable(GL4.GL_STENCIL_TEST);
+				gl.glStencilMask(0x00);
+				meshesRenderingPass(gl, portalCam);
+				gl.glStencilMask(0xFF);
+				gl.glEnable(GL4.GL_STENCIL_TEST);
+
+				//Draw mirror content on corresponding hole
+				gl.glViewport(0, 0, 800, 600);
+				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
+				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
+				gl.glDepthMask(false);
+				postEffectRendering(gl, portalCam, osTex[1]);
 				gl.glDepthMask(true);
 			}
 
@@ -246,6 +286,24 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 		return mirrorCam;
 	}
+	
+	//TODO refactoring 
+		private ICamera createPortalCam(IEntity portalEntity, IEntity cameraEntity) {
+			// Crate camera copy. The camera is docked on mirrorCamEntity attribute
+			// Not clear, TODO refactoring
+			ICamera portalCam = copyCameraComponent(cameraEntity.getCameras().get(0));
+			
+			//Set mirror cam transform
+			IPortal mirror = portalEntity.getPortals().get(0);
+			ITransform camTransform = cameraEntity.getTransforms().get(0);
+			ITransform portalCamTransform = mirrorCamEntity.getTransforms().get(0);
+			portalCamTransform.setWorldTransform(mirror.getViewMatrix(camTransform.getWorldTransform()));
+
+			//Set mirror material
+			portalCam.setMaterial(mirror.getMaterial());
+
+			return portalCam;
+		}
 
 	private void mirrorRenderingPass(GL4 gl, ICamera camera, IEntity mirrorEntity) {
 		List<IMesh> meshes = mirrorEntity.getMeshes();
@@ -263,6 +321,29 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 				//Set the Material Active
 				setUpMaterial(gl, mirrorEntity, mesh.getMaterial(), camera);
+
+				//Draw elements
+				gl.glDrawElements(GL4.GL_TRIANGLES, elementsData.length, GL4.GL_UNSIGNED_INT, 0);
+			}
+		}
+	}
+	
+	private void portalRenderingPass(GL4 gl, ICamera camera, IEntity portalEntity) {
+		List<IMesh> meshes = portalEntity.getMeshes();
+		for (IMesh mesh : meshes) {
+			if (mesh != null && mesh.getMaterial() != null) {
+				//Push Vertices
+				fillVBO(gl, 
+						mesh.getMeshDef().getPosTable(), 
+						mesh.getMeshDef().getColTable(), 
+						mesh.getMeshDef().getOffTable(), 
+						mesh.getMeshDef().getNorTable());
+
+				//Push Elements
+				fillEBO(gl, mesh.getMeshDef().getIdxTable());
+
+				//Set the Material Active
+				setUpMaterial(gl, portalEntity, mesh.getMaterial(), camera);
 
 				//Draw elements
 				gl.glDrawElements(GL4.GL_TRIANGLES, elementsData.length, GL4.GL_UNSIGNED_INT, 0);
