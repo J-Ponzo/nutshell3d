@@ -7,6 +7,8 @@ import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
+import fr.jponzo.gamagora.nutshell3d.scene.SceneManager;
+
 public abstract class AbstractRenderingSystem {
 	protected GLCanvas glcanvas;
 
@@ -18,7 +20,6 @@ public abstract class AbstractRenderingSystem {
 
 		// The canvas
 		this.glcanvas = new GLCanvas(capabilities);   
-		glcanvas.setSize(800, 600);
 		glcanvas.setAutoSwapBufferMode(true);
 
 		GLEventListener glEventListener = new GLEventListener() {
@@ -44,12 +45,14 @@ public abstract class AbstractRenderingSystem {
 			@Override
 			public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
 				GL4 gl = drawable.getGL().getGL4();
-				gl.glViewport(0, 0, width, height);
+				resize(gl, x, y, width, height);		
 			}
 		};
 		glcanvas.addGLEventListener(glEventListener);
 	}
 	
+	protected abstract void resize(GL4 gl, int x, int y, int width, int height);
+
 	protected abstract void render(GL4 drawable);
 	
 	protected abstract void initialize(GL4 drawable);

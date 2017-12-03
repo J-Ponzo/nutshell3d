@@ -178,6 +178,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			ICamera camera = cameraEntity.getCameras().get(0);
 
 			//Set fb0 active
+//			gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 			gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 			gl.glEnable(GL4.GL_DEPTH_TEST);
 
@@ -202,6 +203,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			
 			for (int i = 0; i < mirrorQueue.size(); i++) {
 				//Draw mirror content on fb1
+//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
 				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 				ICamera mirrorCam = createMirrorCam(mirrorQueue.get(i), cameraEntity);
@@ -212,6 +214,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glEnable(GL4.GL_STENCIL_TEST);
 
 				//Draw mirror content on corresponding hole
+//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
@@ -231,6 +234,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			
 			for (int i = 0; i < portalQueue.size(); i++) {
 				//Draw mirror content on fb1
+//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
 				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 				ICamera portalCam = createPortalCam(portalQueue.get(i), cameraEntity);
@@ -241,6 +245,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glEnable(GL4.GL_STENCIL_TEST);
 
 				//Draw mirror content on corresponding hole
+//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
@@ -755,5 +760,10 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		//Copies vertices into the active buffer (ebo)
 		IntBuffer intBuffer = GLBuffers.newDirectIntBuffer(elementsData); 
 		gl.glBufferData(GL4.GL_ELEMENT_ARRAY_BUFFER, elementsData.length * 4, intBuffer, GL4.GL_STATIC_DRAW);
+	}
+
+	@Override
+	protected void resize(GL4 gl, int x, int y, int width, int height) {
+		gl.glViewport(0, 0, width, height);
 	}
 }

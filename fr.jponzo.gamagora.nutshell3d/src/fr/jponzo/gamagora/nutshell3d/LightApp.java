@@ -42,8 +42,8 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class LightApp {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static int width = 800;
-	private static int height = 600;
+	private static int width = 1600;
+	private static int height = 900;
 
 	public static void main(String[] args) throws InterruptedException, OperationNotSupportedException {
 
