@@ -35,6 +35,8 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec4;
 
 public class RenderingSystem extends AbstractRenderingSystem {
+	public static final int NB_CAM_LAYERS = 32;
+	
 	private static class SingletonWrapper {
 		private final static RenderingSystem instance = new RenderingSystem();
 	}
@@ -425,7 +427,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		for (IEntity entity : meshQueue) {
 			List<IMesh> meshes = entity.getMeshes();
 			for (IMesh mesh : meshes) {
-				if (mesh != null && mesh.getMaterial() != null) {
+				if (mesh != null && mesh.getMaterial() != null && matchCameraLayers(mesh, camera)) {
 					//Push Vertices
 					fillVBO(gl, 
 							mesh.getMeshDef().getPosTable(), 
@@ -446,6 +448,15 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		}
 	}
 	
+	private boolean matchCameraLayers(IMesh mesh, ICamera camera) {
+		for (int i = 0; i < NB_CAM_LAYERS; i++) {
+			if (mesh.isEnabledLayer(i) && camera.isEnabledLayer(i)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private void curvesRenderingPass(GL4 gl, ICamera camera) {
 		for (IEntity entity : curveQueue) {
 			List<ICurve> curves = entity.getCurves();

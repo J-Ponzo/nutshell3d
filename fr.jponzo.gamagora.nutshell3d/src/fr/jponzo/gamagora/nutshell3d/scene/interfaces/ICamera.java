@@ -43,4 +43,10 @@ public interface ICamera extends IComponent {
 
 	void setMaterial(IMaterial material);
 
+	void enableLayer(int layer);
+
+	void disableLayer(int layer);
+
+	boolean isEnabledLayer(int layer);
+
 }

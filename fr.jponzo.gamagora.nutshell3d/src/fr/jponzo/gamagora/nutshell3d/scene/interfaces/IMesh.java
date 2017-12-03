@@ -10,4 +10,12 @@ public interface IMesh extends IComponent {
 	IMeshDef getMeshDef();
 	
 	public void removeMaterial();
+
+	void enableLayer(int layer);
+
+	void disableLayer(int layer);
+
+	boolean isEnabledLayer(int layer);
+
+	void setAllLayers(boolean value);
 }

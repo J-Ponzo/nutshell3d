@@ -122,6 +122,7 @@ public class CamLayersApp {
 				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\idPostEffect.frag");
 		camera.setMaterial(camMat);
+		camera.disableLayer(0);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
 			private float moveSpeed = 4f;
@@ -205,13 +206,15 @@ public class CamLayersApp {
 		//Create Ship Mesh
 		IEntity shipEntity = new Entity();
 		transform = new Transform(shipEntity);
-		transform.setLocalTranslate(Matrices.translation(1f, 0f, -1f));
-		transform.setLocalScale(Matrices.scale(2f, 2f, 2f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, 0f));
+		transform.setLocalScale(Matrices.scale(5f, 5f, 5f));
 		IMeshDef shipMeshDef = new MeshDef();
 		shipMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Drone.obj");
 		shipMeshDef.load();
 		IMesh shipMesh = new Mesh(shipEntity, shipMeshDef);
-		rootEntity.addChild(shipEntity);
+		shipMesh.setAllLayers(false);
+		shipMesh.enableLayer(0);
+		cameraEntity.addChild(shipEntity);
 		IMaterial shipMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
@@ -354,12 +357,10 @@ public class CamLayersApp {
 
 		//Create mirrors
 		IMirror mirror = null;
-	
-//				mirror = new Mirror(floorEntity);
-//				mirror = new Mirror(roofEntity);
-//				mirror = new Mirror(lWallEntity);
-//				mirror = new Mirror(rWallEntity);
-				mirror = new Mirror(fWallEntity);
-//				mirror = new Mirror(bWallEntity);
+		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
+		mirror = new Mirror(fWallEntity);
+		mirror.setMaterial(mirrorMat);
 	}
 }

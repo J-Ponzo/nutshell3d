@@ -3,6 +3,7 @@ package fr.jponzo.gamagora.nutshell3d.scene.impl;
 import java.awt.Rectangle;
 
 import fr.jponzo.gamagora.nutshell3d.material.interfaces.IMaterial;
+import fr.jponzo.gamagora.nutshell3d.rendering.RenderingSystem;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
@@ -20,11 +21,30 @@ public class Camera extends AbstractComponent implements ICamera {
 	private float fov;
 	private Rectangle viewport;
 	private boolean isOrtho;
+	private boolean[] layers = new boolean[RenderingSystem.NB_CAM_LAYERS];
 
 	private IMaterial material;
 
 	public Camera(IEntity entity) {
 		super(entity);
+		for (int i = 0; i < RenderingSystem.NB_CAM_LAYERS; i++) {
+			layers[i] = true;
+		}
+	}
+	
+	@Override
+	public void enableLayer(int layer) {
+		layers[layer] = true;
+	}
+	
+	@Override
+	public void disableLayer(int layer) {
+		layers[layer] = false;
+	}
+	
+	@Override
+	public boolean isEnabledLayer(int layer) {
+		return layers[layer];
 	}
 	
 	@Override
