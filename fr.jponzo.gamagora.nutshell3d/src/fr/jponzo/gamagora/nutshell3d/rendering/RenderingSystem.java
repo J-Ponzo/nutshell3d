@@ -375,6 +375,8 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		int texParamId = gl.glGetUniformLocation(shaderProgram, "pst_screenTexture");
 		gl.glUniform1i(texParamId, osTexId);
 
+		bindMaterialUniforms(gl, shaderProgram, mat);
+		
 		//Draw elements
 		gl.glDrawElements(GL4.GL_TRIANGLES, elementsData.length, GL4.GL_UNSIGNED_INT, 0);
 	}
