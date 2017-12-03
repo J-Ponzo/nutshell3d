@@ -362,6 +362,7 @@ public class PortalApp {
 		IMaterial portalMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\portalPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\portalPostEffect.frag");
+		portalMat.setVec3Param("mat_filter", 0.1f, 0.8f, 0.8f);
 
 		IPortal portal1 = new Portal(portal1Entity);
 		portal1.setMaterial(portalMat);

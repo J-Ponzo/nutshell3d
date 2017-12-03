@@ -402,6 +402,7 @@ public class LightApp {
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
 		mirrorMat.setVec3Param("mat_filter", 0.1f, 0.8f, 0.8f);
 		
+		
 		mirror = new Mirror(lWallEntity);
 		mirror.setMaterial(mirrorMat);
 		//		
