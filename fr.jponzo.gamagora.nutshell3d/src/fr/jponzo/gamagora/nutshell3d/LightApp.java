@@ -194,7 +194,7 @@ public class LightApp {
 		transform.setLocalTranslate(Matrices.translation(0f, 0f, 3f));
 		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
 		ILight light = new Light(lightEntity);
-		light.setColor(new Color(255, 150, 150, 255));
+		light.setAlbedo(new Color(255, 255, 255, 255));
 		light.setIntensity(5f);
 		cameraEntity.addChild(lightEntity);
 		IMeshDef sphereMeshDef = new MeshDef();
@@ -217,8 +217,8 @@ public class LightApp {
 		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
 		rootEntity.addChild(boxEntity);
 		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\phongLightTexNorm.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\phongLightTexNorm.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
 		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
 		boxMat.setTexParam("mat_diffTexture", nutDiffTex);
 		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
@@ -254,8 +254,8 @@ public class LightApp {
 		rootEntity.addChild(roomrEntity);
 
 		IMaterial wallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\phongLightTexNorm.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\phongLightTexNorm.frag");
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
 		ITexture wallDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Wall_02_D.png");
 		wallMat.setTexParam("mat_diffTexture", wallDiffTex);
 		ITexture wallNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Wall_02_N.png");

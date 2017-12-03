@@ -666,17 +666,17 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			lightPosition[2] = ((Vec4) transform.getWorldTranslate().getColumn(3)).getZ();
 
 			ILight light = lightEntity.getLights().get(0);
-			float r = ((float) light.getColor().getRed()) / 255f;
-			float g = ((float) light.getColor().getGreen()) / 255f;
-			float b = ((float) light.getColor().getBlue()) / 255f;
-			float[] lightColor = {r, g, b};
+			float r = ((float) light.getAlbedo().getRed()) / 255f;
+			float g = ((float) light.getAlbedo().getGreen()) / 255f;
+			float b = ((float) light.getAlbedo().getBlue()) / 255f;
+			float[] lightAlbedo = {r, g, b};
 			float lightIntensity = light.getIntensity();
 
-			int lightParamId1  = gl.glGetUniformLocation(shaderProgram, "lightPosition");
+			int lightParamId2  = gl.glGetUniformLocation(shaderProgram, "lgt_albedo");
+			gl.glUniform3f(lightParamId2, lightAlbedo[0], lightAlbedo[1], lightAlbedo[2]);
+			int lightParamId1  = gl.glGetUniformLocation(shaderProgram, "lgt_position");
 			gl.glUniform3f(lightParamId1, lightPosition[0], lightPosition[1], lightPosition[2]);
-			int lightParamId2  = gl.glGetUniformLocation(shaderProgram, "lightColor");
-			gl.glUniform3f(lightParamId2, lightColor[0], lightColor[1], lightColor[2]);
-			int lightParamId3  = gl.glGetUniformLocation(shaderProgram, "lightIntensity");
+			int lightParamId3  = gl.glGetUniformLocation(shaderProgram, "lgt_intensity");
 			gl.glUniform1f(lightParamId3, lightIntensity);
 		}
 	}

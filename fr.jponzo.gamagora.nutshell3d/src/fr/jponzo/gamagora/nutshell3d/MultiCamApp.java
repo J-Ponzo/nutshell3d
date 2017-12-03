@@ -109,7 +109,7 @@ public class MultiCamApp {
 		transform = new Transform(lightEntity);
 		transform.setLocalTranslate(Matrices.translation(2f, 2f, -2f));
 		ILight light = new Light(lightEntity);
-		light.setColor(
+		light.setAlbedo(
 				new Color(255, 255, 255, 255)
 				);
 		light.setIntensity(10f);

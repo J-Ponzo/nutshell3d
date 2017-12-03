@@ -4,9 +4,9 @@ import java.awt.Color;
 
 public interface ILight extends IComponent {
 
-	Color getColor();
+	Color getAlbedo();
 
-	void setColor(Color color);
+	void setAlbedo(Color color);
 
 	float getIntensity();
 

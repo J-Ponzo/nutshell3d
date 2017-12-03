@@ -6,7 +6,7 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 
 public class Light extends AbstractComponent implements ILight {
-	private Color color;
+	private Color albedo;
 	private float intensity;
 	
 	public Light(IEntity entity) {
@@ -14,13 +14,13 @@ public class Light extends AbstractComponent implements ILight {
 	}
 	
 	@Override
-	public Color getColor() {
-		return color;
+	public Color getAlbedo() {
+		return albedo;
 	}
 	
 	@Override
-	public void setColor(Color color) {
-		this.color = color;
+	public void setAlbedo(Color color) {
+		this.albedo = color;
 	}
 	
 	@Override
