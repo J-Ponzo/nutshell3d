@@ -24,7 +24,7 @@ void main()
 	gl_Position = viewPosition;
 
 	//Compute LightDir and Distance in world base
-	WPosition = mod_WMatrix * vec4(position, 1.0);
+	WPosition = vec4(position, 1.0) * mod_WMatrix;
 
 	//Pass UV & Normal
 	Texcoord = texcoord;
