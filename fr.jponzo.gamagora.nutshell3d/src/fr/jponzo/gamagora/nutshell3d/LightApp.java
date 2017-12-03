@@ -26,12 +26,14 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Entity;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Light;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
+import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
+import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
 import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
@@ -188,24 +190,25 @@ public class LightApp {
 		};
 		SceneManager.getInstance().setActiveCamera(camera);
 
-		//Create Light
-		IEntity lightEntity = new Entity();
-		transform = new Transform(lightEntity);
+		//Create Lights
+		//Cam Light
+		IEntity camLightEntity = new Entity();
+		transform = new Transform(camLightEntity);
 		transform.setLocalTranslate(Matrices.translation(0f, 0f, 3f));
 		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-		ILight light = new Light(lightEntity);
+		ILight light = new Light(camLightEntity);
 		light.setAlbedo(new Color(255, 255, 255, 255));
 		light.setIntensity(5f);
-		cameraEntity.addChild(lightEntity);
+		cameraEntity.addChild(camLightEntity);
 		IMeshDef sphereMeshDef = new MeshDef();
 		sphereMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\sphere.obj");
 		sphereMeshDef.load();
-		IMesh sphereMesh = new Mesh(lightEntity, sphereMeshDef);
-		IMaterial lightMat = MaterialManager.getInstance().createMaterial(
+		IMesh whiteSphereMesh = new Mesh(camLightEntity, sphereMeshDef);
+		IMaterial wightLightMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		lightMat.setVec3Param("mat_color", 1f, 1f, 1f);
-		sphereMesh.setMaterial(lightMat);
+		wightLightMat.setVec3Param("mat_color", 1f, 1f, 1f);
+		whiteSphereMesh.setMaterial(wightLightMat);
 
 		//Create Box Mesh
 		IEntity boxEntity = new Entity();
@@ -260,7 +263,7 @@ public class LightApp {
 		wallMat.setTexParam("mat_diffTexture", wallDiffTex);
 		ITexture wallNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Wall_02_N.png");
 		wallMat.setTexParam("mat_normTexture", wallNormalTex);
-		
+
 		//Create Floor
 		IEntity floorEntity = new Entity();
 		transform = new Transform(floorEntity);
@@ -323,19 +326,88 @@ public class LightApp {
 		roomrEntity.addChild(rWallEntity);
 		rWallMesh.setMaterial(wallMat);
 
-//		//Create mirrors
-//		IMirror mirror = null;
-//		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
-//				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
-//				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
-//		
-//		mirror = new Mirror(lWallEntity);
-//		mirror.setMaterial(mirrorMat);
-//		
-//		mirror = new Mirror(bWallEntity);
-//		mirror.setMaterial(mirrorMat);
-//		
-//		mirror = new Mirror(roofEntity);
-//		mirror.setMaterial(mirrorMat);
+		//Lights 
+		IMeshDef sphereMeshDef = new MeshDef();
+		sphereMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\sphere.obj");
+		sphereMeshDef.load();
+
+		//Scene red light
+		IEntity redLightEntity = new Entity();
+		transform = new Transform(redLightEntity);
+		transform.setLocalTranslate(Matrices.translation(-3f, 0f, -3f));
+		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		ILight redLight = new Light(redLightEntity);
+		redLight.setAlbedo(new Color(255, 100, 100, 255));
+		redLight.setIntensity(2f);
+		roomrEntity.addChild(redLightEntity);
+		IMesh redSphereMesh = new Mesh(redLightEntity, sphereMeshDef);
+		IMaterial redLightMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		redLightMat.setVec3Param("mat_color", 1f, 0f, 0f);
+		redSphereMesh.setMaterial(redLightMat);
+
+		//Scene green light
+		IEntity greenLightEntity = new Entity();
+		transform = new Transform(greenLightEntity);
+		transform.setLocalTranslate(Matrices.translation(3f, 0f, -3f));
+		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		ILight greenLight = new Light(greenLightEntity);
+		greenLight.setAlbedo(new Color(100, 255, 100, 255));
+		greenLight.setIntensity(2f);
+		roomrEntity.addChild(greenLightEntity);
+		IMesh greenSphereMesh = new Mesh(greenLightEntity, sphereMeshDef);
+		IMaterial greenLightMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		greenLightMat.setVec3Param("mat_color", 0f, 1f, 0f);
+		greenSphereMesh.setMaterial(greenLightMat);
+
+		//Scene blue light
+		IEntity blueLightEntity = new Entity();
+		transform = new Transform(blueLightEntity);
+		transform.setLocalTranslate(Matrices.translation(3f, 0f, 3f));
+		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		ILight blueLight = new Light(blueLightEntity);
+		blueLight.setAlbedo(new Color(100, 100, 255, 255));
+		blueLight.setIntensity(2f);
+		roomrEntity.addChild(blueLightEntity);
+		IMesh blueSphereMesh = new Mesh(blueLightEntity, sphereMeshDef);
+		IMaterial blueLightMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		blueLightMat.setVec3Param("mat_color", 0f, 0f, 1f);
+		blueSphereMesh.setMaterial(blueLightMat);
+
+		//Scene yellow light
+		IEntity yellowLightEntity = new Entity();
+		transform = new Transform(yellowLightEntity);
+		transform.setLocalTranslate(Matrices.translation(-3f, 0f, 3f));
+		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		ILight yellowLight = new Light(yellowLightEntity);
+		yellowLight.setAlbedo(new Color(255, 255, 100, 255));
+		yellowLight.setIntensity(2f);
+		roomrEntity.addChild(yellowLightEntity);
+		IMesh yellowSphereMesh = new Mesh(yellowLightEntity, sphereMeshDef);
+		IMaterial yellowLightMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		yellowLightMat.setVec3Param("mat_color", 1f, 1f, 0f);
+		yellowSphereMesh.setMaterial(yellowLightMat);
+
+		//		//Create mirrors
+		IMirror mirror = null;
+		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
+		
+		mirror = new Mirror(lWallEntity);
+		mirror.setMaterial(mirrorMat);
+		//		
+		//		mirror = new Mirror(bWallEntity);
+		//		mirror.setMaterial(mirrorMat);
+		//		
+		//		mirror = new Mirror(roofEntity);
+		//		mirror.setMaterial(mirrorMat);
 	}
 }

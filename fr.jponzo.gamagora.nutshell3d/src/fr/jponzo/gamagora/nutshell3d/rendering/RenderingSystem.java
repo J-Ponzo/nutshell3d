@@ -137,9 +137,9 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		//Create out screen texture Beffers on last text offset
 		gl.glGenTextures(2, IntBuffer.wrap(osTex));
 		gl.glBindTexture(GL4.GL_TEXTURE_2D, osTex[0]);
-		gl.glTexStorage2D(GL4.GL_TEXTURE_2D, 1, GL4.GL_RGB8, 800, 600);
+		gl.glTexStorage2D(GL4.GL_TEXTURE_2D, 1, GL4.GL_RGB8, glcanvas.getWidth(), glcanvas.getHeight());
 		gl.glBindTexture(GL4.GL_TEXTURE_2D, osTex[1]);
-		gl.glTexStorage2D(GL4.GL_TEXTURE_2D, 1, GL4.GL_RGB8, 800, 600);
+		gl.glTexStorage2D(GL4.GL_TEXTURE_2D, 1, GL4.GL_RGB8, glcanvas.getWidth(), glcanvas.getHeight());
 
 		//Create out screen FBO and provide it with an out screen texture
 		gl.glGenFramebuffers(2, IntBuffer.wrap(osFb));
@@ -152,7 +152,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		gl.glGenRenderbuffers(1, rbIdPtr1);
 		int rbId = rbIdPtr1.get(0);
 		gl.glBindRenderbuffer(GL4.GL_RENDERBUFFER, rbId);
-		gl.glRenderbufferStorage(GL4.GL_RENDERBUFFER, GL4.GL_DEPTH24_STENCIL8, 800, 600);
+		gl.glRenderbufferStorage(GL4.GL_RENDERBUFFER, GL4.GL_DEPTH24_STENCIL8, glcanvas.getWidth(), glcanvas.getHeight());
 		gl.glFramebufferRenderbuffer(GL4.GL_FRAMEBUFFER, GL4.GL_DEPTH_ATTACHMENT, GL4.GL_RENDERBUFFER, rbId);
 		gl.glFramebufferRenderbuffer(GL4.GL_FRAMEBUFFER, GL4.GL_STENCIL_ATTACHMENT, GL4.GL_RENDERBUFFER, rbId);
 
@@ -164,7 +164,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		gl.glGenRenderbuffers(1, rbIdPtr2);
 		rbId = rbIdPtr2.get(0);
 		gl.glBindRenderbuffer(GL4.GL_RENDERBUFFER, rbId);
-		gl.glRenderbufferStorage(GL4.GL_RENDERBUFFER, GL4.GL_DEPTH24_STENCIL8, 800, 600);
+		gl.glRenderbufferStorage(GL4.GL_RENDERBUFFER, GL4.GL_DEPTH24_STENCIL8, glcanvas.getWidth(), glcanvas.getHeight());
 		gl.glFramebufferRenderbuffer(GL4.GL_FRAMEBUFFER, GL4.GL_DEPTH_ATTACHMENT, GL4.GL_RENDERBUFFER, rbId);
 		gl.glFramebufferRenderbuffer(GL4.GL_FRAMEBUFFER, GL4.GL_STENCIL_ATTACHMENT, GL4.GL_RENDERBUFFER, rbId);
 	}
@@ -178,7 +178,6 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			ICamera camera = cameraEntity.getCameras().get(0);
 
 			//Set fb0 active
-			gl.glViewport(0, 0, 800, 600);
 			gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 			gl.glEnable(GL4.GL_DEPTH_TEST);
 
@@ -203,7 +202,6 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			
 			for (int i = 0; i < mirrorQueue.size(); i++) {
 				//Draw mirror content on fb1
-				gl.glViewport(0, 0, 800, 600);
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
 				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 				ICamera mirrorCam = createMirrorCam(mirrorQueue.get(i), cameraEntity);
@@ -214,7 +212,6 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glEnable(GL4.GL_STENCIL_TEST);
 
 				//Draw mirror content on corresponding hole
-				gl.glViewport(0, 0, 800, 600);
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
@@ -234,7 +231,6 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			
 			for (int i = 0; i < portalQueue.size(); i++) {
 				//Draw mirror content on fb1
-				gl.glViewport(0, 0, 800, 600);
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
 				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 				ICamera portalCam = createPortalCam(portalQueue.get(i), cameraEntity);
@@ -245,7 +241,6 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glEnable(GL4.GL_STENCIL_TEST);
 
 				//Draw mirror content on corresponding hole
-				gl.glViewport(0, 0, 800, 600);
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
@@ -657,8 +652,8 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 	private void bindLightUniforms(GL4 gl, int shaderProgram) {
 		//Bind Light attrs
-		if (lightQueue.size() > 0) {
-			IEntity lightEntity = lightQueue.get(0);
+		for (int i = 0; i < lightQueue.size(); i++) {
+			IEntity lightEntity = lightQueue.get(i);
 			float[] lightPosition = new float[3];
 			ITransform transform = lightEntity.getTransforms().get(0);
 			lightPosition[0] = ((Vec4) transform.getWorldTranslate().getColumn(3)).getX();
@@ -672,11 +667,11 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			float[] lightAlbedo = {r, g, b};
 			float lightIntensity = light.getIntensity();
 
-			int lightParamId2  = gl.glGetUniformLocation(shaderProgram, "lgt_albedo");
+			int lightParamId2  = gl.glGetUniformLocation(shaderProgram, "lgt_albedo[" + i + "]");
 			gl.glUniform3f(lightParamId2, lightAlbedo[0], lightAlbedo[1], lightAlbedo[2]);
-			int lightParamId1  = gl.glGetUniformLocation(shaderProgram, "lgt_position");
+			int lightParamId1  = gl.glGetUniformLocation(shaderProgram, "lgt_position[" + i + "]");
 			gl.glUniform3f(lightParamId1, lightPosition[0], lightPosition[1], lightPosition[2]);
-			int lightParamId3  = gl.glGetUniformLocation(shaderProgram, "lgt_intensity");
+			int lightParamId3  = gl.glGetUniformLocation(shaderProgram, "lgt_intensity[" + i + "]");
 			gl.glUniform1f(lightParamId3, lightIntensity);
 		}
 	}
