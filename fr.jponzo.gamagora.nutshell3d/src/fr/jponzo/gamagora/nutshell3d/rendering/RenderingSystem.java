@@ -416,8 +416,8 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		ITransform mirrorCamTransform = new Transform(mirrorCamEntity);	
 		mirrorCam.setWidth(camera.getWidth());
 		mirrorCam.setHeight(camera.getHeight());
-		mirrorCam.setNear(1);
-		mirrorCam.setFar(100);
+		mirrorCam.setNear(camera.getNear());
+		mirrorCam.setFar(camera.getFar());
 		mirrorCam.setFov(camera.getFov());
 		mirrorCam.setViewport(camera.getViewport());
 		mirrorCam.setOrtho(camera.isOrtho());

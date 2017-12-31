@@ -7,21 +7,21 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 
 public interface ICamera extends IComponent {
 
-	void setWidth(int width);
+	void setWidth(float width);
 
-	int getWidth();
+	float getWidth();
 
-	int getHeight();
+	float getHeight();
 
-	void setHeight(int height);
+	void setHeight(float height);
 
-	int getNear();
+	float getNear();
 
-	void setNear(int near);
+	void setNear(float near);
 
-	int getFar();
+	float getFar();
 
-	void setFar(int far);
+	void setFar(float far);
 
 	float getFov();
 

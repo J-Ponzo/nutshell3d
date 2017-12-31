@@ -14,10 +14,10 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec4;
 
 public class Camera extends AbstractComponent implements ICamera {
 	//TODO duplicate info with viewport
-	private int width;
-	private int height;
-	private int near;
-	private int far;
+	private float width;
+	private float height;
+	private float near;
+	private float far;
 	private float fov;
 	private Rectangle viewport;
 	private boolean isOrtho;
@@ -48,42 +48,42 @@ public class Camera extends AbstractComponent implements ICamera {
 	}
 	
 	@Override
-	public int getWidth() {
+	public float getWidth() {
 		return width;
 	}
 	
 	@Override
-	public void setWidth(int width) {
+	public void setWidth(float width) {
 		this.width = width;
 	}
 	
 	@Override
-	public int getHeight() {
+	public float getHeight() {
 		return height;
 	}
 	
 	@Override
-	public void setHeight(int height) {
+	public void setHeight(float height) {
 		this.height = height;
 	}
 	
 	@Override
-	public int getNear() {
+	public float getNear() {
 		return near;
 	}
 	
 	@Override
-	public void setNear(int near) {
+	public void setNear(float near) {
 		this.near = near;
 	}
 	
 	@Override
-	public int getFar() {
+	public float getFar() {
 		return far;
 	}
 	
 	@Override
-	public void setFar(int far) {
+	public void setFar(float far) {
 		this.far = far;
 	}
 	
@@ -140,6 +140,6 @@ public class Camera extends AbstractComponent implements ICamera {
 
 	@Override
 	public Mat4 getProjMatrix() {
-		return Matrices.perspective((float) fov, (float) width / (float) height, (float) near, (float) far);
+		return Matrices.perspective(fov, width / height, near, far);
 	}
 }

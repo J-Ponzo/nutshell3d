@@ -110,7 +110,7 @@ public class LightApp {
 		ICamera camera = new Camera(cameraEntity);
 		camera.setWidth(width);
 		camera.setHeight(height);
-		camera.setNear(1);
+		camera.setNear(0.01f);
 		camera.setFar(100);
 		camera.setFov(60f);
 		camera.setViewport(
