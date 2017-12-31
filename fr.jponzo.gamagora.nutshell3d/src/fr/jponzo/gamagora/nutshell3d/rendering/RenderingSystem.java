@@ -178,7 +178,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			ICamera camera = cameraEntity.getCameras().get(0);
 
 			//Set fb0 active
-//			gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
+			gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 			gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 			gl.glEnable(GL4.GL_DEPTH_TEST);
 
