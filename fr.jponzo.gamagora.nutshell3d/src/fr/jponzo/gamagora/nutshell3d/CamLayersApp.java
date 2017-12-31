@@ -229,16 +229,16 @@ public class CamLayersApp {
 		transform = new Transform(boxEntity);
 		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
 		IMeshDef boxMeshDef = new MeshDef();
-		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
+		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Feisar.obj");
 		boxMeshDef.load();
 		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
 		rootEntity.addChild(boxEntity);
 		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
-		ITexture boxDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
+		ITexture boxDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Feisar_D.png");
 		boxMat.setTexParam("mat_diffTexture", boxDiffTex);
-		ITexture boxNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
+		ITexture boxNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Feisar_N.png");
 		boxMat.setTexParam("mat_normTexture", boxNormalTex);
 		boxMesh.setMaterial(boxMat);
 		new AbstractUpdator(boxEntity) {
@@ -360,6 +360,7 @@ public class CamLayersApp {
 		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
+		mirrorMat.setVec3Param("mat_filter", 0.8f, 0.8f, 0.8f);
 		mirror = new Mirror(fWallEntity);
 		mirror.setMaterial(mirrorMat);
 	}

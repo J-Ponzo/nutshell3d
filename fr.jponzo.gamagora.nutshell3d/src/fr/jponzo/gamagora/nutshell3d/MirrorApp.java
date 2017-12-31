@@ -338,6 +338,7 @@ public class MirrorApp {
 		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
+		mirrorMat.setVec3Param("mat_filter", 0.8f, 0.8f, 0.8f);
 		
 		mirror = new Mirror(lWallEntity);
 		mirror.setMaterial(mirrorMat);
