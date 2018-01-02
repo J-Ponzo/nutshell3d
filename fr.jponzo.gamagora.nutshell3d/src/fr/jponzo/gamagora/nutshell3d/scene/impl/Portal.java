@@ -84,8 +84,6 @@ public class Portal extends AbstractComponent implements IPortal {
 		
 		Vec3 correction = trgTrans.getFwd().multiply(3f);
 		trgEyeMat = Matrices.translation(correction.getX(), correction.getY(), correction.getZ()).multiply(trgEyeMat);
-////		Mat4 trgEyeMat = eyeMat.multiply(srcViewMat).add(Matrices.yRotation((float) Math.PI)).multiply(trgInvViewMat);
-//		Mat4 trgEyeMat = trgInvViewMat.multiply(Matrices.yRotation((float) Math.PI)).add(srcViewMat).multiply(eyeMat);
 
 		return trgEyeMat;
 	}

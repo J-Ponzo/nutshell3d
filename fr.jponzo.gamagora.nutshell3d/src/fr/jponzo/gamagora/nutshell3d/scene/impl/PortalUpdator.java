@@ -16,6 +16,7 @@ public class PortalUpdator extends AbstractUpdator {
 	}
 
 	private float lastDot = 0;
+	private boolean crossedThisFrame = false;
 	private IEntity cameraEntity;
 	
 	@Override
@@ -25,6 +26,7 @@ public class PortalUpdator extends AbstractUpdator {
 
 	@Override
 	public void update(long deltaTime) {
+		IEntity source = entity.getPortals().get(0).getEntity();
 		IEntity target = entity.getPortals().get(0).getTarget().getEntity();
 		
 		Vec4 mirPos4 = entity.getTransforms().get(0).getWorldTranslate().getColumn(3);
@@ -36,18 +38,24 @@ public class PortalUpdator extends AbstractUpdator {
 		Vec3 MA = A.subtract(M);
 	
 		float newDot = n.dot(MA);
-		if (lastDot != 0 && lastDot * newDot < 0 && MA.getLength() < 3) {
+		if (lastDot != 0 && lastDot * newDot < 0 && MA.getLength() < 0.5) {
 			//Disable target
 			PortalUpdator trgUpdator = (PortalUpdator) target.getUpdators().get(0);
 			trgUpdator.lastDot = 0;
+			trgUpdator.crossedThisFrame = true;
+			this.lastDot = 0;
 			
 			//Set mirror cam transform
-			IPortal portal = target.getPortals().get(0);
+			IPortal portal = source.getPortals().get(0);
 			ITransform camTransform = cameraEntity.getTransforms().get(0);
-			Mat4 m1 = Matrices.yRotation((float) (Math.PI));
-			Mat4 m2 = portal.getViewMatrix(camTransform.getWorldTransform());
-			camTransform.setLocalTransform(m2.multiply(m1));
+			camTransform.setLocalTransform(portal.getViewMatrix(camTransform.getWorldTransform()));
+			
+			return;
 		}
-		lastDot = newDot;
+		if (crossedThisFrame) {
+			crossedThisFrame = false;
+		} else {
+			lastDot = newDot;
+		}
 	}
 }

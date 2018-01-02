@@ -28,6 +28,7 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Portal;
+import fr.jponzo.gamagora.nutshell3d.scene.impl.PortalUpdator;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
@@ -278,6 +279,7 @@ public class CastleApp {
 		transform.setLocalTranslate(Matrices.translation(0f, -0.25f, 1.5f));
 		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)));
 		transform.setLocalScale(Matrices.scale(1f, 1f, 1f));
+		new PortalUpdator(portal1Entity, cameraEntity);
 		IMesh portal1Mesh = new Mesh(portal1Entity, squareMeshDef);
 		westRoomEntity.addChild(portal1Entity);
 		portal1Mesh.setMaterial(defaultMat);
@@ -289,6 +291,7 @@ public class CastleApp {
 		transform.setLocalTranslate(Matrices.translation(1.5f, -0.25f, 0f));
 		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(1f, 1f, 1f));
+		new PortalUpdator(portal2Entity, cameraEntity);
 		IMesh portal2Mesh = new Mesh(portal2Entity, squareMeshDef);
 		northRoomEntity.addChild(portal2Entity);
 		portal2Mesh.setMaterial(defaultMat);

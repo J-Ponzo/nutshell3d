@@ -30,7 +30,7 @@ public abstract class AbstractRenderingSystem {
 				long time = System.currentTimeMillis();
 				render(gl);
 				long renderTime = System.currentTimeMillis() - time;
-				System.out.println(renderTime);
+//				System.out.println(renderTime);
 			}
 
 			@Override
