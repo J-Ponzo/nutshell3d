@@ -1,5 +1,6 @@
 package fr.jponzo.gamagora.nutshell3d.scene.impl;
 
+import fr.jponzo.gamagora.nutshell3d.material.interfaces.IMaterial;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IPortal;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
@@ -17,6 +18,7 @@ public class PortalUpdator extends AbstractUpdator {
 
 	private float lastDot = 0;
 	private boolean crossedThisFrame = false;
+	private long totalTime;
 	private IEntity cameraEntity;
 	
 	@Override
@@ -26,8 +28,15 @@ public class PortalUpdator extends AbstractUpdator {
 
 	@Override
 	public void update(long deltaTime) {
+		totalTime += deltaTime;
+		
 		IEntity source = entity.getPortals().get(0).getEntity();
 		IEntity target = entity.getPortals().get(0).getTarget().getEntity();
+		
+		IMaterial portalMat = target.getPortals().get(0).getMaterial();
+		portalMat.setFloatParam("mat_time", (float) totalTime / 1000f);
+		portalMat.setFloatParam("mat_periode", 500);
+		portalMat.setFloatParam("mat_amplitude", 50f);
 		
 		Vec4 mirPos4 = entity.getTransforms().get(0).getWorldTranslate().getColumn(3);
 		Vec4 camPos4 = cameraEntity.getTransforms().get(0).getWorldTranslate().getColumn(3);
