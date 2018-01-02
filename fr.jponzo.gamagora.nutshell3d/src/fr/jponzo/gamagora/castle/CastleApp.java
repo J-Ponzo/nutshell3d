@@ -54,6 +54,7 @@ public class CastleApp {
 	private static MeshDef wallCornerMeshDef;
 	private static MeshDef wallWindowMeshDef;
 	private static MeshDef wallDoorMeshDef;
+	private static MeshDef roofMeshDef;
 	private static IMeshDef chessboadMeshDef;
 	private static IMeshDef squareMeshDef;
 	private static IMeshDef armorMeshDef;
@@ -140,7 +141,7 @@ public class CastleApp {
 		//Create Camera
 		cameraEntity = new Entity();
 		transform = new Transform(cameraEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 0f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0.2f, 0f));
 		ICamera camera = new Camera(cameraEntity);
 		camera.setWidth(width);
 		camera.setHeight(height);
@@ -396,6 +397,15 @@ public class CastleApp {
 	private static void createNorthRoom(IEntity roomEntity) {
 		ITransform transform;
 
+		//center roof
+		IEntity cRoofEntity = new Entity();
+		transform = new Transform(cRoofEntity);
+		transform.setLocalTranslate(Matrices.translation(0f, 0.1f, 0.05f));
+		transform.setLocalScale(Matrices.scale(2.7f, 3f, 2.7f));
+		IMesh cRoofMesh = new Mesh(cRoofEntity, roofMeshDef);
+		roomEntity.addChild(cRoofEntity);
+		cRoofMesh.setMaterial(woodMat);
+
 		//east window
 		IEntity eastWindowEntity = new Entity();
 		transform = new Transform(eastWindowEntity);
@@ -533,18 +543,47 @@ public class CastleApp {
 		//Shield 1
 		IEntity shield1Entity = new Entity();
 		transform = new Transform(shield1Entity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 1f));
-		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
-				Matrices.xRotation((float) (-Math.PI / 2))));
+		transform.setLocalTranslate(Matrices.translation(-1.2f, -0.15f, 0.5f));
+		transform.setLocalScale(Matrices.scale(0.4f, 0.4f, 0.4f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)));
 		IMesh sield1Mesh = new Mesh(shield1Entity, shieldMeshDef);
 		roomEntity.addChild(shield1Entity);
 		sield1Mesh.setMaterial(shieldMat);
 
+		//Shield 2
+		IEntity shield2Entity = new Entity();
+		transform = new Transform(shield2Entity);
+		transform.setLocalTranslate(Matrices.translation(-1.2f, -0.15f, -0.5f));
+		transform.setLocalScale(Matrices.scale(0.4f, 0.4f, 0.4f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)));
+		IMesh sield2Mesh = new Mesh(shield2Entity, shieldMeshDef);
+		roomEntity.addChild(shield2Entity);
+		sield2Mesh.setMaterial(shieldMat);
+
+		//Shield 3
+		IEntity shield3Entity = new Entity();
+		transform = new Transform(shield3Entity);
+		transform.setLocalTranslate(Matrices.translation(1.2f, -0.15f, 0.5f));
+		transform.setLocalScale(Matrices.scale(0.4f, 0.4f, 0.4f));
+		//		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)));
+		IMesh sield3Mesh = new Mesh(shield3Entity, shieldMeshDef);
+		roomEntity.addChild(shield3Entity);
+		sield3Mesh.setMaterial(shieldMat);
+
+		//Shield 4
+		IEntity shield4Entity = new Entity();
+		transform = new Transform(shield4Entity);
+		transform.setLocalTranslate(Matrices.translation(1.2f, -0.15f, -0.5f));
+		transform.setLocalScale(Matrices.scale(0.4f, 0.4f, 0.4f));
+		//		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)));
+		IMesh sield4Mesh = new Mesh(shield4Entity, shieldMeshDef);
+		roomEntity.addChild(shield4Entity);
+		sield4Mesh.setMaterial(shieldMat);
+
 		//Table
 		IEntity tableEntity = new Entity();
 		transform = new Transform(tableEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, -0.62f, 0f));
+		transform.setLocalTranslate(Matrices.translation(-0.25f, -0.62f, 0f));
 		transform.setLocalScale(Matrices.scale(1f, 0.75f, 1f));
 		IMesh tableMesh = new Mesh(tableEntity, tableMeshDef);
 		roomEntity.addChild(tableEntity);
@@ -553,6 +592,15 @@ public class CastleApp {
 
 	private static void createWestRoom(IEntity roomEntity) {
 		ITransform transform;
+
+		//center roof
+		IEntity cRoofEntity = new Entity();
+		transform = new Transform(cRoofEntity);
+		transform.setLocalTranslate(Matrices.translation(0f, 0.1f, 0.05f));
+		transform.setLocalScale(Matrices.scale(2.7f, 3f, 2.7f));
+		IMesh cRoofMesh = new Mesh(cRoofEntity, roofMeshDef);
+		roomEntity.addChild(cRoofEntity);
+		cRoofMesh.setMaterial(woodMat);
 
 		//south window
 		IEntity southWindowEntity = new Entity();
@@ -717,6 +765,10 @@ public class CastleApp {
 		wallDoorMeshDef = new MeshDef();
 		wallDoorMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\CastleWallRoundDoor.obj");
 		wallDoorMeshDef.load();
+
+		roofMeshDef = new MeshDef();
+		roofMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\CastleWoodRoof.obj");
+		roofMeshDef.load();
 
 		chessboadMeshDef = new MeshDef();
 		chessboadMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\chessBoard.obj");
