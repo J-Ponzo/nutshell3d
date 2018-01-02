@@ -28,6 +28,7 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Portal;
+import fr.jponzo.gamagora.nutshell3d.scene.impl.PortalUpdator;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
@@ -46,7 +47,8 @@ public class PortalApp {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
-
+	private static Entity cameraEntity;
+	
 	public static void main(String[] args) throws InterruptedException, OperationNotSupportedException {
 
 		//creating frame
@@ -106,13 +108,13 @@ public class PortalApp {
 		SceneManager.getInstance().setRoot(rootEntity);
 
 		//Create Camera
-		IEntity cameraEntity = new Entity();
+		cameraEntity = new Entity();
 		transform = new Transform(cameraEntity);
 		transform.setLocalTranslate(Matrices.translation(0f, 0.5f, -3f));
 		ICamera camera = new Camera(cameraEntity);
 		camera.setWidth(width);
 		camera.setHeight(height);
-		camera.setNear(1);
+		camera.setNear(0.01f);
 		camera.setFar(100);
 		camera.setFov(60f);
 		camera.setViewport(
@@ -204,37 +206,37 @@ public class PortalApp {
 		rootEntity.addChild(lightEntity);
 
 		//Create Box Mesh
-		IEntity boxEntity = new Entity();
-		transform = new Transform(boxEntity);
-		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
-		IMeshDef boxMeshDef = new MeshDef();
-		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
-		boxMeshDef.load();
-		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
-		rootEntity.addChild(boxEntity);
-		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
-		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
-		boxMat.setTexParam("mat_diffTexture", nutDiffTex);
-		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
-		boxMat.setTexParam("mat_normTexture", nutNormalTex);
-		boxMesh.setMaterial(boxMat);
-		new AbstractUpdator(boxEntity) {
-			private float speed = (float) (Math.PI / 2);
-
-			@Override
-			public void update(long deltaTime) {
-				ITransform transform = entity.getTransforms().get(0);
-				Mat4 localRotation = transform.getLocalRotate();
-				Mat4 offsetRotation = Matrices.yRotation(speed * ((float) deltaTime / 1000f));
-				transform.setLocalRotate(offsetRotation.multiply(localRotation));
-			}
-
-			@Override
-			public void init() {
-			}
-		};
+//		IEntity boxEntity = new Entity();
+//		transform = new Transform(boxEntity);
+//		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
+//		IMeshDef boxMeshDef = new MeshDef();
+//		boxMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Scifi_Box_01.obj");
+//		boxMeshDef.load();
+//		IMesh boxMesh = new Mesh(boxEntity, boxMeshDef);
+//		rootEntity.addChild(boxEntity);
+//		IMaterial boxMat = MaterialManager.getInstance().createMaterial(
+//				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
+//				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
+//		ITexture nutDiffTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_03_D.png");
+//		boxMat.setTexParam("mat_diffTexture", nutDiffTex);
+//		ITexture nutNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Scifi_Box_01_N.png");
+//		boxMat.setTexParam("mat_normTexture", nutNormalTex);
+//		boxMesh.setMaterial(boxMat);
+//		new AbstractUpdator(boxEntity) {
+//			private float speed = (float) (Math.PI / 2);
+//
+//			@Override
+//			public void update(long deltaTime) {
+//				ITransform transform = entity.getTransforms().get(0);
+//				Mat4 localRotation = transform.getLocalRotate();
+//				Mat4 offsetRotation = Matrices.yRotation(speed * ((float) deltaTime / 1000f));
+//				transform.setLocalRotate(offsetRotation.multiply(localRotation));
+//			}
+//
+//			@Override
+//			public void init() {
+//			}
+//		};
 
 		createRoom(rootEntity);
 	}
@@ -347,22 +349,25 @@ public class PortalApp {
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		portalWallMat.setVec3Param("mat_color", 0.5f, 0.5f, 0.5f);
 		portal1Mesh.setMaterial(portalWallMat);
+		new PortalUpdator(portal1Entity, cameraEntity);
 
 		//Create Portal 2
 		IEntity portal2Entity = new Entity();
 		transform = new Transform(portal2Entity);
-		transform.setLocalTranslate(Matrices.translation(-1f, -2f, -1f));
+//		transform.setLocalTranslate(Matrices.translation(-1f, -2f, -1f));
+		transform.setLocalTranslate(Matrices.translation(-10f, 0f, 0f));
 		transform.setLocalRotate(Matrices.yRotation((float) (3 * Math.PI / 2)));
 		transform.setLocalScale(Matrices.scale(3f, 3f, 1f));
 		IMesh portal2Mesh = new Mesh(portal2Entity, wallMeshDef);
 		roomrEntity.addChild(portal2Entity);
 		portal2Mesh.setMaterial(portalWallMat);
+		new PortalUpdator(portal2Entity, cameraEntity);
 
 		//Set portals
 		IMaterial portalMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\portalPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\portalPostEffect.frag");
-		portalMat.setVec3Param("mat_filter", 0.1f, 0.8f, 0.8f);
+		portalMat.setVec3Param("mat_filter", 0.8f, 0.8f, 0.8f);
 
 		IPortal portal1 = new Portal(portal1Entity);
 		portal1.setMaterial(portalMat);
@@ -378,6 +383,7 @@ public class PortalApp {
 		IMaterial mirrorMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\mirrorPostEffect.frag");
+		mirrorMat.setVec3Param("mat_filter", 0.8f, 0.8f, 0.8f);
 
 		mirror = new Mirror(roofEntity);
 		mirror.setMaterial(mirrorMat);

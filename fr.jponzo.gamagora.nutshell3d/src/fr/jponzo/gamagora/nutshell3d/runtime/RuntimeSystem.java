@@ -85,8 +85,8 @@ public class RuntimeSystem {
 		long currentTime = System.currentTimeMillis();
 		InputManager.getInstance().onPreUpdatePass();
 		
-		SceneManager.getInstance().updatePass(deltaTime);
 		SceneManager.getInstance().computeWorldMatricesPass(deltaTime);
+		SceneManager.getInstance().updatePass(deltaTime);
 		
 		InputManager.getInstance().onPostUpdatePass();
 		RenderingSystem.getInstance().renderPass(SceneManager.getInstance().getRoot());

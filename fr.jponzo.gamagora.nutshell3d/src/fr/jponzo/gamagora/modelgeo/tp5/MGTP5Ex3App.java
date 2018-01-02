@@ -407,7 +407,7 @@ public class MGTP5Ex3App {
 		//		mirror = new Mirror(roofEntity);
 		//		mirror = new Mirror(lWallEntity);
 		//		mirror = new Mirror(rWallEntity);
-		mirror = new Mirror(fWallEntity);
+//		mirror = new Mirror(fWallEntity);
 		//		mirror = new Mirror(bWallEntity);
 	}
 }

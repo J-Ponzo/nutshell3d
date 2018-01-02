@@ -227,6 +227,7 @@ public class MeshDef implements IMeshDef {
 		int dataIndex = 0;
 		for (int i = 0; i < idxLines.size() ; i++) {
 			String[] indices = idxLines.get(i).split(" ");
+			indices = cleanTokens(indices);
 			String ind1 = indices[1];
 			String ind2 = indices[2];
 			String ind3 = indices[3];
