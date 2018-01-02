@@ -319,21 +319,21 @@ public class CastleApp {
 		redLightMat.setVec3Param("mat_color", 1f, 0f, 0f);
 		redSphereMesh.setMaterial(redLightMat);
 
-		//		//Scene green light
-		//		IEntity greenLightEntity = new Entity();
-		//		transform = new Transform(greenLightEntity);
-		//		transform.setLocalTranslate(Matrices.translation(3f, 0f, -3f));
-		//		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-		//		ILight greenLight = new Light(greenLightEntity);
-		//		greenLight.setAlbedo(new Color(100, 255, 100, 255));
-		//		greenLight.setIntensity(2f);
-		//		crossCorridorsEntity.addChild(greenLightEntity);
-		//		IMesh greenSphereMesh = new Mesh(greenLightEntity, sphereMeshDef);
-		//		IMaterial greenLightMat = MaterialManager.getInstance().createMaterial(
-		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		//		greenLightMat.setVec3Param("mat_color", 0f, 1f, 0f);
-		//		greenSphereMesh.setMaterial(greenLightMat);
+		//				//Scene green light
+		//				IEntity greenLightEntity = new Entity();
+		//				transform = new Transform(greenLightEntity);
+		//				transform.setLocalTranslate(Matrices.translation(3f, 0f, -3f));
+		//				transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		//				ILight greenLight = new Light(greenLightEntity);
+		//				greenLight.setAlbedo(new Color(100, 255, 100, 255));
+		//				greenLight.setIntensity(2f);
+		//				crossCorridorsEntity.addChild(greenLightEntity);
+		//				IMesh greenSphereMesh = new Mesh(greenLightEntity, sphereMeshDef);
+		//				IMaterial greenLightMat = MaterialManager.getInstance().createMaterial(
+		//						IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+		//						IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		//				greenLightMat.setVec3Param("mat_color", 0f, 1f, 0f);
+		//				greenSphereMesh.setMaterial(greenLightMat);
 
 		//Scene blue light
 		IEntity blueLightEntity = new Entity();
@@ -351,21 +351,21 @@ public class CastleApp {
 		blueLightMat.setVec3Param("mat_color", 0f, 0f, 1f);
 		blueSphereMesh.setMaterial(blueLightMat);
 
-		//		//Scene yellow light
-		//		IEntity yellowLightEntity = new Entity();
-		//		transform = new Transform(yellowLightEntity);
-		//		transform.setLocalTranslate(Matrices.translation(-3f, 0f, 3f));
-		//		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-		//		ILight yellowLight = new Light(yellowLightEntity);
-		//		yellowLight.setAlbedo(new Color(255, 255, 100, 255));
-		//		yellowLight.setIntensity(2f);
-		//		crossCorridorsEntity.addChild(yellowLightEntity);
-		//		IMesh yellowSphereMesh = new Mesh(yellowLightEntity, sphereMeshDef);
-		//		IMaterial yellowLightMat = MaterialManager.getInstance().createMaterial(
-		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		//		yellowLightMat.setVec3Param("mat_color", 1f, 1f, 0f);
-		//		yellowSphereMesh.setMaterial(yellowLightMat);
+//		//Scene yellow light
+//		IEntity yellowLightEntity = new Entity();
+//		transform = new Transform(yellowLightEntity);
+//		transform.setLocalTranslate(Matrices.translation(3f, 0f, 3f));
+//		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+//		ILight yellowLight = new Light(yellowLightEntity);
+//		yellowLight.setAlbedo(new Color(255, 255, 100, 255));
+//		yellowLight.setIntensity(2f);
+//		crossCorridorsEntity.addChild(yellowLightEntity);
+//		IMesh yellowSphereMesh = new Mesh(yellowLightEntity, sphereMeshDef);
+//		IMaterial yellowLightMat = MaterialManager.getInstance().createMaterial(
+//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+//		yellowLightMat.setVec3Param("mat_color", 1f, 1f, 0f);
+//		yellowSphereMesh.setMaterial(yellowLightMat);
 	}
 
 	private static void createFloor(IEntity roomEntity) {

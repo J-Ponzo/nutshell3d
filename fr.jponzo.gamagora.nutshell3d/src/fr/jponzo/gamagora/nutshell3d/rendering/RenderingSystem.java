@@ -31,7 +31,9 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IPortal;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
+import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
+import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec4;
 
 public class RenderingSystem extends AbstractRenderingSystem {
@@ -317,14 +319,14 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		// Not clear, TODO refactoring
 		ICamera portalCam = copyCameraComponent(cameraEntity.getCameras().get(0));
 
-		//Set mirror cam transform
-		IPortal mirror = portalEntity.getPortals().get(0);
+		//Set portal cam transform
+		IPortal portal = portalEntity.getPortals().get(0);
 		ITransform camTransform = cameraEntity.getTransforms().get(0);
 		ITransform portalCamTransform = mirrorCamEntity.getTransforms().get(0);
-		portalCamTransform.setWorldTransform(mirror.getViewMatrix(camTransform.getWorldTransform()));
-
+		portalCamTransform.setWorldTransform(portal.getViewMatrix(camTransform.getWorldTransform()));
+		
 		//Set mirror material
-		portalCam.setMaterial(mirror.getMaterial());
+		portalCam.setMaterial(portal.getMaterial());
 
 		return portalCam;
 	}
