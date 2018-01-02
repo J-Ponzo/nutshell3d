@@ -60,7 +60,7 @@ public class MaterialManager {
 		materialDefsTable.put(key, materialDef);
 	}
 	
-	private String buildMaterialDefKey(String vertPath, String fragPath) {
+	public String buildMaterialDefKey(String vertPath, String fragPath) {
 		return vertPath +"->"+fragPath;
 	}
 

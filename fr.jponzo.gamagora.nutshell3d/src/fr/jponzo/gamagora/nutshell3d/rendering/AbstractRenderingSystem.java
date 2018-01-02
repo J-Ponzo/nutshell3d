@@ -27,7 +27,10 @@ public abstract class AbstractRenderingSystem {
 			@Override
 			public void display(GLAutoDrawable drawable) {
 				GL4 gl = drawable.getGL().getGL4();
+				long time = System.currentTimeMillis();
 				render(gl);
+				long renderTime = System.currentTimeMillis() - time;
+				System.out.println(renderTime);
 			}
 
 			@Override

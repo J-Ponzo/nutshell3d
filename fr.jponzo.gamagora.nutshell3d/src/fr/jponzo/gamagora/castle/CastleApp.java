@@ -228,7 +228,7 @@ public class CastleApp {
 		//Cam Light
 		IEntity camLightEntity = new Entity();
 		transform = new Transform(camLightEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 0.25f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, 0.5f));
 		ILight light = new Light(camLightEntity);
 		light.setAlbedo(new Color(255, 255, 255, 255));
 		light.setIntensity(0.1f);
@@ -306,10 +306,10 @@ public class CastleApp {
 		IEntity redLightEntity = new Entity();
 		transform = new Transform(redLightEntity);
 		transform.setLocalTranslate(Matrices.translation(3f, 0f, 0f));
-		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		transform.setLocalScale(Matrices.scale(0.05f, 0.05f, 0.05f));
 		ILight redLight = new Light(redLightEntity);
 		redLight.setAlbedo(new Color(255, 100, 100, 255));
-		redLight.setIntensity(2f);
+		redLight.setIntensity(0.5f);
 		crossCorridorsEntity.addChild(redLightEntity);
 		IMesh redSphereMesh = new Mesh(redLightEntity, sphereMeshDef);
 		IMaterial redLightMat = MaterialManager.getInstance().createMaterial(
@@ -318,30 +318,30 @@ public class CastleApp {
 		redLightMat.setVec3Param("mat_color", 1f, 0f, 0f);
 		redSphereMesh.setMaterial(redLightMat);
 
-		//Scene green light
-		IEntity greenLightEntity = new Entity();
-		transform = new Transform(greenLightEntity);
-		transform.setLocalTranslate(Matrices.translation(3f, 0f, -3f));
-		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-		ILight greenLight = new Light(greenLightEntity);
-		greenLight.setAlbedo(new Color(100, 255, 100, 255));
-		greenLight.setIntensity(2f);
-		crossCorridorsEntity.addChild(greenLightEntity);
-		IMesh greenSphereMesh = new Mesh(greenLightEntity, sphereMeshDef);
-		IMaterial greenLightMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		greenLightMat.setVec3Param("mat_color", 0f, 1f, 0f);
-		greenSphereMesh.setMaterial(greenLightMat);
+		//		//Scene green light
+		//		IEntity greenLightEntity = new Entity();
+		//		transform = new Transform(greenLightEntity);
+		//		transform.setLocalTranslate(Matrices.translation(3f, 0f, -3f));
+		//		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		//		ILight greenLight = new Light(greenLightEntity);
+		//		greenLight.setAlbedo(new Color(100, 255, 100, 255));
+		//		greenLight.setIntensity(2f);
+		//		crossCorridorsEntity.addChild(greenLightEntity);
+		//		IMesh greenSphereMesh = new Mesh(greenLightEntity, sphereMeshDef);
+		//		IMaterial greenLightMat = MaterialManager.getInstance().createMaterial(
+		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		//		greenLightMat.setVec3Param("mat_color", 0f, 1f, 0f);
+		//		greenSphereMesh.setMaterial(greenLightMat);
 
 		//Scene blue light
 		IEntity blueLightEntity = new Entity();
 		transform = new Transform(blueLightEntity);
 		transform.setLocalTranslate(Matrices.translation(0f, 0f, 3f));
-		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		transform.setLocalScale(Matrices.scale(0.05f, 0.05f, 0.05f));
 		ILight blueLight = new Light(blueLightEntity);
 		blueLight.setAlbedo(new Color(100, 100, 255, 255));
-		blueLight.setIntensity(2f);
+		blueLight.setIntensity(0.5f);
 		crossCorridorsEntity.addChild(blueLightEntity);
 		IMesh blueSphereMesh = new Mesh(blueLightEntity, sphereMeshDef);
 		IMaterial blueLightMat = MaterialManager.getInstance().createMaterial(
@@ -350,21 +350,21 @@ public class CastleApp {
 		blueLightMat.setVec3Param("mat_color", 0f, 0f, 1f);
 		blueSphereMesh.setMaterial(blueLightMat);
 
-		//Scene yellow light
-		IEntity yellowLightEntity = new Entity();
-		transform = new Transform(yellowLightEntity);
-		transform.setLocalTranslate(Matrices.translation(-3f, 0f, 3f));
-		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-		ILight yellowLight = new Light(yellowLightEntity);
-		yellowLight.setAlbedo(new Color(255, 255, 100, 255));
-		yellowLight.setIntensity(2f);
-		crossCorridorsEntity.addChild(yellowLightEntity);
-		IMesh yellowSphereMesh = new Mesh(yellowLightEntity, sphereMeshDef);
-		IMaterial yellowLightMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		yellowLightMat.setVec3Param("mat_color", 1f, 1f, 0f);
-		yellowSphereMesh.setMaterial(yellowLightMat);
+		//		//Scene yellow light
+		//		IEntity yellowLightEntity = new Entity();
+		//		transform = new Transform(yellowLightEntity);
+		//		transform.setLocalTranslate(Matrices.translation(-3f, 0f, 3f));
+		//		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		//		ILight yellowLight = new Light(yellowLightEntity);
+		//		yellowLight.setAlbedo(new Color(255, 255, 100, 255));
+		//		yellowLight.setIntensity(2f);
+		//		crossCorridorsEntity.addChild(yellowLightEntity);
+		//		IMesh yellowSphereMesh = new Mesh(yellowLightEntity, sphereMeshDef);
+		//		IMaterial yellowLightMat = MaterialManager.getInstance().createMaterial(
+		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+		//				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		//		yellowLightMat.setVec3Param("mat_color", 1f, 1f, 0f);
+		//		yellowSphereMesh.setMaterial(yellowLightMat);
 	}
 
 	private static void createFloor(IEntity roomEntity) {
@@ -466,81 +466,81 @@ public class CastleApp {
 		roomEntity.addChild(wsCornerCorrEntity);
 		wsCornerCorrMesh.setMaterial(stoneMat);
 
-				//Armor 1
-				IEntity armor1Entity = new Entity();
-				transform = new Transform(armor1Entity);
-				transform.setLocalTranslate(Matrices.translation(0f, -0.49f, 1.5f));
-				transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
-				transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)).multiply(
-						Matrices.xRotation((float) (-Math.PI / 2))));
-				IMesh armor1Mesh = new Mesh(armor1Entity, armorMeshDef);
-				roomEntity.addChild(armor1Entity);
-				armor1Mesh.setMaterial(armorMat);
-		//
-		//		//Armor 2
-		//		IEntity armor2Entity = new Entity();
-		//		transform = new Transform(armor2Entity);
-		//		transform.setLocalTranslate(Matrices.translation(-0.25f, -0.49f, 1f));
-		//		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
-		//		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)).multiply(
-		//				Matrices.xRotation((float) (-Math.PI / 2))));
-		//		IMesh armor2Mesh = new Mesh(armor2Entity, armorMeshDef);
-		//		roomEntity.addChild(armor2Entity);
-		//		armor2Mesh.setMaterial(armorMat);
-		//
-		//		//Armor 3
-		//		IEntity armor3Entity = new Entity();
-		//		transform = new Transform(armor3Entity);
-		//		transform.setLocalTranslate(Matrices.translation(0.25f, -0.49f, -1f));
-		//		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
-		//		transform.setLocalRotate(Matrices.xRotation((float) (-Math.PI / 2)));
-		//		IMesh armor3Mesh = new Mesh(armor3Entity, armorMeshDef);
-		//		roomEntity.addChild(armor3Entity);
-		//		armor3Mesh.setMaterial(armorMat);
-		//
-		//		//Armor 4
-		//		IEntity armor4Entity = new Entity();
-		//		transform = new Transform(armor4Entity);
-		//		transform.setLocalTranslate(Matrices.translation(-0.25f, -0.49f, -1f));
-		//		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
-		//		transform.setLocalRotate(Matrices.xRotation((float) (-Math.PI / 2)));
-		//		IMesh armor4Mesh = new Mesh(armor4Entity, armorMeshDef);
-		//		roomEntity.addChild(armor4Entity);
-		//		armor4Mesh.setMaterial(armorMat);
+		//Armor 1
+		IEntity armor1Entity = new Entity();
+		transform = new Transform(armor1Entity);
+		transform.setLocalTranslate(Matrices.translation(0.25f, -0.49f, 1f));
+		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)).multiply(
+				Matrices.xRotation((float) (-Math.PI / 2))));
+		IMesh armor1Mesh = new Mesh(armor1Entity, armorMeshDef);
+		roomEntity.addChild(armor1Entity);
+		armor1Mesh.setMaterial(armorMat);
 
-//		//Armor 5
-//		IEntity armor5Entity = new Entity();
-//		transform = new Transform(armor5Entity);
-//		transform.setLocalTranslate(Matrices.translation(1f, -0.49f, 0.25f));
-//		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
-//		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
-//				Matrices.xRotation((float) (-Math.PI / 2))));
-//		IMesh armor5Mesh = new Mesh(armor5Entity, armorMeshDef);
-//		roomEntity.addChild(armor5Entity);
-//		armor5Mesh.setMaterial(armorMat);
-//
-//		//Armor 4
-//		IEntity armor6Entity = new Entity();
-//		transform = new Transform(armor6Entity);
-//		transform.setLocalTranslate(Matrices.translation(1f, -0.49f, -0.25f));
-//		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
-//		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
-//				Matrices.xRotation((float) (-Math.PI / 2))));
-//		IMesh armor6Mesh = new Mesh(armor6Entity, armorMeshDef);
-//		roomEntity.addChild(armor6Entity);
-//		armor6Mesh.setMaterial(armorMat);
+		//Armor 2
+		IEntity armor2Entity = new Entity();
+		transform = new Transform(armor2Entity);
+		transform.setLocalTranslate(Matrices.translation(-0.25f, -0.49f, 1f));
+		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI)).multiply(
+				Matrices.xRotation((float) (-Math.PI / 2))));
+		IMesh armor2Mesh = new Mesh(armor2Entity, armorMeshDef);
+		roomEntity.addChild(armor2Entity);
+		armor2Mesh.setMaterial(armorMat);
 
-//		//Shield 1
-//		IEntity shield1Entity = new Entity();
-//		transform = new Transform(shield1Entity);
-//		transform.setLocalTranslate(Matrices.translation(0f, 0f, 1f));
-//		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
-//		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
-//				Matrices.xRotation((float) (-Math.PI / 2))));
-//		IMesh sield1Mesh = new Mesh(shield1Entity, shieldMeshDef);
-//		roomEntity.addChild(shield1Entity);
-//		sield1Mesh.setMaterial(shieldMat);
-		
+		//Armor 3
+		IEntity armor3Entity = new Entity();
+		transform = new Transform(armor3Entity);
+		transform.setLocalTranslate(Matrices.translation(0.25f, -0.49f, -1f));
+		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
+		transform.setLocalRotate(Matrices.xRotation((float) (-Math.PI / 2)));
+		IMesh armor3Mesh = new Mesh(armor3Entity, armorMeshDef);
+		roomEntity.addChild(armor3Entity);
+		armor3Mesh.setMaterial(armorMat);
+
+		//Armor 4
+		IEntity armor4Entity = new Entity();
+		transform = new Transform(armor4Entity);
+		transform.setLocalTranslate(Matrices.translation(-0.25f, -0.49f, -1f));
+		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
+		transform.setLocalRotate(Matrices.xRotation((float) (-Math.PI / 2)));
+		IMesh armor4Mesh = new Mesh(armor4Entity, armorMeshDef);
+		roomEntity.addChild(armor4Entity);
+		armor4Mesh.setMaterial(armorMat);
+
+		//Armor 5
+		IEntity armor5Entity = new Entity();
+		transform = new Transform(armor5Entity);
+		transform.setLocalTranslate(Matrices.translation(1f, -0.49f, 0.25f));
+		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
+		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
+				Matrices.xRotation((float) (-Math.PI / 2))));
+		IMesh armor5Mesh = new Mesh(armor5Entity, armorMeshDef);
+		roomEntity.addChild(armor5Entity);
+		armor5Mesh.setMaterial(armorMat);
+
+		//Armor 4
+		IEntity armor6Entity = new Entity();
+		transform = new Transform(armor6Entity);
+		transform.setLocalTranslate(Matrices.translation(1f, -0.49f, -0.25f));
+		transform.setLocalScale(Matrices.scale(0.5f, 0.5f, 0.5f));
+		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
+				Matrices.xRotation((float) (-Math.PI / 2))));
+		IMesh armor6Mesh = new Mesh(armor6Entity, armorMeshDef);
+		roomEntity.addChild(armor6Entity);
+		armor6Mesh.setMaterial(armorMat);
+
+		//Shield 1
+		IEntity shield1Entity = new Entity();
+		transform = new Transform(shield1Entity);
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, 1f));
+		transform.setLocalScale(Matrices.scale(0.2f, 0.2f, 0.2f));
+		transform.setLocalRotate(Matrices.yRotation((float) (-Math.PI / 2)).multiply(
+				Matrices.xRotation((float) (-Math.PI / 2))));
+		IMesh sield1Mesh = new Mesh(shield1Entity, shieldMeshDef);
+		roomEntity.addChild(shield1Entity);
+		sield1Mesh.setMaterial(shieldMat);
+
 		//Table
 		IEntity tableEntity = new Entity();
 		transform = new Transform(tableEntity);
@@ -733,15 +733,15 @@ public class CastleApp {
 		shieldMeshDef = new MeshDef();
 		shieldMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Shield.obj");
 		shieldMeshDef.load();
-		
+
 		tableMeshDef = new MeshDef();
 		tableMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Table.obj");
 		tableMeshDef.load();
-		
+
 		chairMeshDef = new MeshDef();
 		chairMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Chair.obj");
 		chairMeshDef.load();
-		
+
 		//Create Materials
 		defaultMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
@@ -755,7 +755,7 @@ public class CastleApp {
 		stoneMat.setTexParam("mat_diffTexture", stoneDiffTex);
 		ITexture stoneNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\CastleStone_N.png");
 		stoneMat.setTexParam("mat_normTexture", stoneNormalTex);
-		
+
 		woodMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");
@@ -771,7 +771,7 @@ public class CastleApp {
 		shieldMat.setTexParam("mat_diffTexture", shieldDiffTex);
 		ITexture shieldNormalTex = MaterialManager.getInstance().createTexture(IOUtils.RES_FOLDER_PATH + "textures\\Shield_N.png");
 		shieldMat.setTexParam("mat_normTexture", shieldNormalTex);
-		
+
 		armorMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLightTexNorm.frag");

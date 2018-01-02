@@ -4,10 +4,10 @@ import java.awt.Rectangle;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
-
-import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL4;
@@ -17,6 +17,7 @@ import com.jogamp.opengl.util.GLBuffers;
 import fr.jponzo.gamagora.modelgeo.tp5.ICurve;
 import fr.jponzo.gamagora.nutshell3d.material.impl.MaterialManager;
 import fr.jponzo.gamagora.nutshell3d.material.interfaces.IMaterial;
+import fr.jponzo.gamagora.nutshell3d.material.interfaces.IMaterialDef;
 import fr.jponzo.gamagora.nutshell3d.material.interfaces.ITexture;
 import fr.jponzo.gamagora.nutshell3d.material.interfaces.ITextureLocation;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Camera;
@@ -26,17 +27,16 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
+import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IPortal;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
-import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
-import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec4;
 
 public class RenderingSystem extends AbstractRenderingSystem {
 	public static final int NB_CAM_LAYERS = 32;
-	
+
 	private static class SingletonWrapper {
 		private final static RenderingSystem instance = new RenderingSystem();
 	}
@@ -61,6 +61,11 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 	private int[] osFb = new int[2];
 	private int[] osTex = new int[2];
+
+	private int shaderProgram;
+
+	private String loadedMeshPath = null;
+	private String loadedMaterialPath = null;
 
 	private List<IEntity> meshQueue = new ArrayList<IEntity>();
 	private List<IEntity> cameraQueue = new ArrayList<IEntity>();
@@ -103,6 +108,23 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				&& entity.getMirrors().size() == 0
 				&& entity.getPortals().size() == 0) {
 			meshQueue.add(entity);
+			Collections.sort(meshQueue, new Comparator<IEntity>() {
+
+				@Override
+				public int compare(IEntity o1, IEntity o2) {
+					String path1 = o1.getMeshes().get(0).getMeshDef().getPath();
+					String path2 = o1.getMeshes().get(0).getMeshDef().getPath();
+					int hash1 = path1.hashCode();
+					int hash2 = path2.hashCode();
+					if (hash1 > hash2) {
+						return 1;
+					} else if (hash1 < hash2) {
+						return -1;
+					} else {
+						return 0;
+					}
+				}
+			});
 		}
 		if (entity.getLights().size() > 0) {
 			lightQueue.add(entity);
@@ -190,7 +212,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			curvesRenderingPass(gl, camera);
 			gl.glStencilMask(0xFF);
 			gl.glEnable(GL4.GL_STENCIL_TEST);
-			
+
 			//Mirrors Rendering
 			//Init stencil
 			gl.glClear(GL4.GL_STENCIL_BUFFER_BIT);
@@ -200,10 +222,10 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				IEntity mirrorEntity = mirrorQueue.get(i);
 				mirrorRenderingPass(gl, camera, mirrorEntity);
 			}
-			
+
 			for (int i = 0; i < mirrorQueue.size(); i++) {
 				//Draw mirror content on fb1
-//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
+				//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
 				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 				ICamera mirrorCam = createMirrorCam(mirrorQueue.get(i), cameraEntity);
@@ -214,14 +236,14 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glEnable(GL4.GL_STENCIL_TEST);
 
 				//Draw mirror content on corresponding hole
-//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
+				//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
 				postEffectRendering(gl, mirrorCam, osTex[1]);
 				gl.glDepthMask(true);
 			}
-			
+
 			//Portals Rendering
 			//Init stencil
 			gl.glClear(GL4.GL_STENCIL_BUFFER_BIT);
@@ -231,10 +253,10 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				IEntity portalEntity = portalQueue.get(i);
 				portalRenderingPass(gl, camera, portalEntity);
 			}
-			
+
 			for (int i = 0; i < portalQueue.size(); i++) {
 				//Draw mirror content on fb1
-//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
+				//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[1]);
 				gl.glClear(GL4.GL_COLOR_BUFFER_BIT | GL4.GL_DEPTH_BUFFER_BIT);
 				ICamera portalCam = createPortalCam(portalQueue.get(i), cameraEntity);
@@ -245,7 +267,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				gl.glEnable(GL4.GL_STENCIL_TEST);
 
 				//Draw mirror content on corresponding hole
-//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
+				//				gl.glViewport(0, 0, glcanvas.getWidth(), glcanvas.getHeight());
 				gl.glBindFramebuffer(GL4.GL_FRAMEBUFFER, osFb[0]);
 				gl.glStencilFunc(GL4.GL_EQUAL, i + 1, 0xFF);
 				gl.glDepthMask(false);
@@ -276,7 +298,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		// Crate camera copy. The camera is docked on mirrorCamEntity attribute
 		// Not clear, TODO refactoring
 		ICamera mirrorCam = copyCameraComponent(cameraEntity.getCameras().get(0));
-		
+
 		//Set mirror cam transform
 		IMirror mirror = mirrorEntity.getMirrors().get(0);
 		ITransform camTransform = cameraEntity.getTransforms().get(0);
@@ -288,38 +310,44 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 		return mirrorCam;
 	}
-	
+
 	//TODO refactoring 
-		private ICamera createPortalCam(IEntity portalEntity, IEntity cameraEntity) {
-			// Crate camera copy. The camera is docked on mirrorCamEntity attribute
-			// Not clear, TODO refactoring
-			ICamera portalCam = copyCameraComponent(cameraEntity.getCameras().get(0));
-			
-			//Set mirror cam transform
-			IPortal mirror = portalEntity.getPortals().get(0);
-			ITransform camTransform = cameraEntity.getTransforms().get(0);
-			ITransform portalCamTransform = mirrorCamEntity.getTransforms().get(0);
-			portalCamTransform.setWorldTransform(mirror.getViewMatrix(camTransform.getWorldTransform()));
+	private ICamera createPortalCam(IEntity portalEntity, IEntity cameraEntity) {
+		// Crate camera copy. The camera is docked on mirrorCamEntity attribute
+		// Not clear, TODO refactoring
+		ICamera portalCam = copyCameraComponent(cameraEntity.getCameras().get(0));
 
-			//Set mirror material
-			portalCam.setMaterial(mirror.getMaterial());
+		//Set mirror cam transform
+		IPortal mirror = portalEntity.getPortals().get(0);
+		ITransform camTransform = cameraEntity.getTransforms().get(0);
+		ITransform portalCamTransform = mirrorCamEntity.getTransforms().get(0);
+		portalCamTransform.setWorldTransform(mirror.getViewMatrix(camTransform.getWorldTransform()));
 
-			return portalCam;
-		}
+		//Set mirror material
+		portalCam.setMaterial(mirror.getMaterial());
+
+		return portalCam;
+	}
 
 	private void mirrorRenderingPass(GL4 gl, ICamera camera, IEntity mirrorEntity) {
+		loadedMeshPath = null;
+		loadedMaterialPath = null;
 		List<IMesh> meshes = mirrorEntity.getMeshes();
 		for (IMesh mesh : meshes) {
 			if (mesh != null && mesh.getMaterial() != null) {
-				//Push Vertices
-				fillVBO(gl, 
-						mesh.getMeshDef().getPosTable(), 
-						mesh.getMeshDef().getColTable(), 
-						mesh.getMeshDef().getOffTable(), 
-						mesh.getMeshDef().getNorTable());
+				if (!isAlradyLoaded(mesh.getMeshDef())) {
+					//Push Vertices
+					fillVBO(gl, 
+							mesh.getMeshDef().getPosTable(), 
+							mesh.getMeshDef().getColTable(), 
+							mesh.getMeshDef().getOffTable(), 
+							mesh.getMeshDef().getNorTable());
 
-				//Push Elements
-				fillEBO(gl, mesh.getMeshDef().getIdxTable());
+					//Push Elements
+					fillEBO(gl, mesh.getMeshDef().getIdxTable());
+
+					loadedMeshPath = mesh.getMeshDef().getPath();
+				}
 
 				//Set the Material Active
 				setUpMaterial(gl, mirrorEntity, mesh.getMaterial(), camera);
@@ -329,20 +357,26 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			}
 		}
 	}
-	
+
 	private void portalRenderingPass(GL4 gl, ICamera camera, IEntity portalEntity) {
+		loadedMeshPath = null;
+		loadedMaterialPath = null;
 		List<IMesh> meshes = portalEntity.getMeshes();
 		for (IMesh mesh : meshes) {
 			if (mesh != null && mesh.getMaterial() != null) {
-				//Push Vertices
-				fillVBO(gl, 
-						mesh.getMeshDef().getPosTable(), 
-						mesh.getMeshDef().getColTable(), 
-						mesh.getMeshDef().getOffTable(), 
-						mesh.getMeshDef().getNorTable());
+				if (!isAlradyLoaded(mesh.getMeshDef())) {
+					//Push Vertices
+					fillVBO(gl, 
+							mesh.getMeshDef().getPosTable(), 
+							mesh.getMeshDef().getColTable(), 
+							mesh.getMeshDef().getOffTable(), 
+							mesh.getMeshDef().getNorTable());
 
-				//Push Elements
-				fillEBO(gl, mesh.getMeshDef().getIdxTable());
+					//Push Elements
+					fillEBO(gl, mesh.getMeshDef().getIdxTable());
+					
+					loadedMeshPath = mesh.getMeshDef().getPath();
+				}
 
 				//Set the Material Active
 				setUpMaterial(gl, portalEntity, mesh.getMaterial(), camera);
@@ -376,7 +410,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		gl.glUniform1i(texParamId, osTexId);
 
 		bindMaterialUniforms(gl, shaderProgram, mat);
-		
+
 		//Draw elements
 		gl.glDrawElements(GL4.GL_TRIANGLES, elementsData.length, GL4.GL_UNSIGNED_INT, 0);
 	}
@@ -426,20 +460,25 @@ public class RenderingSystem extends AbstractRenderingSystem {
 	}
 
 	private void meshesRenderingPass(GL4 gl, ICamera camera) {
+		loadedMeshPath = null;
+		loadedMaterialPath = null;
 		for (IEntity entity : meshQueue) {
 			List<IMesh> meshes = entity.getMeshes();
 			for (IMesh mesh : meshes) {
 				if (mesh != null && mesh.getMaterial() != null && matchCameraLayers(mesh, camera)) {
-					//Push Vertices
-					fillVBO(gl, 
-							mesh.getMeshDef().getPosTable(), 
-							mesh.getMeshDef().getColTable(), 
-							mesh.getMeshDef().getOffTable(), 
-							mesh.getMeshDef().getNorTable());
+					if (!isAlradyLoaded(mesh.getMeshDef())) {
+						//Push Vertices
+						fillVBO(gl, 
+								mesh.getMeshDef().getPosTable(), 
+								mesh.getMeshDef().getColTable(), 
+								mesh.getMeshDef().getOffTable(), 
+								mesh.getMeshDef().getNorTable());
 
-					//Push Elements
-					fillEBO(gl, mesh.getMeshDef().getIdxTable());
+						//Push Elements
+						fillEBO(gl, mesh.getMeshDef().getIdxTable());
 
+						loadedMeshPath = mesh.getMeshDef().getPath();
+					}
 					//Set the Material Active
 					setUpMaterial(gl, entity, mesh.getMaterial(), camera);
 
@@ -449,7 +488,24 @@ public class RenderingSystem extends AbstractRenderingSystem {
 			}
 		}
 	}
-	
+
+	private boolean isAlradyLoaded(IMeshDef meshDef) {
+		if (loadedMeshPath!= null && meshDef.getPath().equals(loadedMeshPath)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isAlradyLoaded(IMaterialDef materialDef) {
+		String curMaterialPath = MaterialManager.getInstance().buildMaterialDefKey(
+				materialDef.getVertexShaderPath(), 
+				materialDef.getFragmentShaderPath());
+		if (loadedMaterialPath != null && curMaterialPath.equals(loadedMaterialPath)) {
+			return true;
+		}
+		return false;
+	}
+
 	private boolean matchCameraLayers(IMesh mesh, ICamera camera) {
 		for (int i = 0; i < NB_CAM_LAYERS; i++) {
 			if (mesh.isEnabledLayer(i) && camera.isEnabledLayer(i)) {
@@ -466,7 +522,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				if (curve != null && curve.getMaterial() != null) {
 					float[][] emptyTable = new float[0][0];
 					IMaterial curveMat = curve.getMaterial();
-					
+
 					//Draw Controls
 					//Push Vertices
 					fillVBO(gl, 
@@ -481,7 +537,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 					//Draw elements
 					gl.glDrawArrays(GL4.GL_LINE_STRIP, 0, curve.getControlPtsTable().length);
-					
+
 					//Draw points
 					//Push Vertices
 					fillVBO(gl, 
@@ -548,13 +604,20 @@ public class RenderingSystem extends AbstractRenderingSystem {
 	}
 
 	private void setUpMaterial(GL4 gl, IEntity entity, IMaterial mat, ICamera cam) {
-		//Create a program Shader
-		int vertexShader = loadShaderFromSource(gl, mat.getMaterialDef().getVertexShaderSource(), GL4.GL_VERTEX_SHADER);
-		int fragmentShader = loadShaderFromSource(gl, mat.getMaterialDef().getFragmentShaderSource(), GL4.GL_FRAGMENT_SHADER);
-		int shaderProgram = buildShaderProgram(gl, vertexShader, fragmentShader);
+		if (!isAlradyLoaded(mat.getMaterialDef())) {
+			//Create a program Shader
+			int vertexShader = loadShaderFromSource(gl, mat.getMaterialDef().getVertexShaderSource(), GL4.GL_VERTEX_SHADER);
+			int fragmentShader = loadShaderFromSource(gl, mat.getMaterialDef().getFragmentShaderSource(), GL4.GL_FRAGMENT_SHADER);
+			shaderProgram = buildShaderProgram(gl, vertexShader, fragmentShader);
 
-		//Make program Shader the active program
-		gl.glUseProgram(shaderProgram);
+			//Make program Shader the active program
+			gl.glUseProgram(shaderProgram);
+
+			String curMaterialPath = MaterialManager.getInstance().buildMaterialDefKey(
+					mat.getMaterialDef().getVertexShaderPath(), 
+					mat.getMaterialDef().getFragmentShaderPath());
+			loadedMaterialPath = curMaterialPath;
+		}
 
 		//Bind Shader program attributes
 		bindVBOAttributes(gl, shaderProgram);
