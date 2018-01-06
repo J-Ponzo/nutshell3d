@@ -395,13 +395,5 @@ public class MGTP5Ex2App {
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
-
-		IMirror mirror = null;
-		//		mirror = new Mirror(floorEntity);
-		//		mirror = new Mirror(roofEntity);
-		//		mirror = new Mirror(lWallEntity);
-		//		mirror = new Mirror(rWallEntity);
-		mirror = new Mirror(fWallEntity);
-		//		mirror = new Mirror(bWallEntity);
 	}
 }

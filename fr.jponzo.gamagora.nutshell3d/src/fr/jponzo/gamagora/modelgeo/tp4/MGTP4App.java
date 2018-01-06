@@ -200,7 +200,7 @@ public class MGTP4App {
 		//Create Light
 		IEntity lightEntity = new Entity();
 		transform = new Transform(lightEntity);
-		transform.setLocalTranslate(Matrices.translation(2f, 2f, -2f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, -1f));
 		ILight light = new Light(lightEntity);
 		light.setAlbedo(
 				new Color(255, 255, 255, 255)

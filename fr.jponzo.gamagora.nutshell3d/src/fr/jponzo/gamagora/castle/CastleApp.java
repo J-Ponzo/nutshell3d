@@ -45,8 +45,10 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class CastleApp {
 	private static final String APP_NAME = "Nutshell3D App";
-	private static int width = 1920;
-	private static int height = 1080;
+	private static int width = 1600;
+	private static int height = 900;
+//	private static int width = 1920;
+//	private static int height = 1080;
 
 	private static Entity cameraEntity;
 

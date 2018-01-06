@@ -4,8 +4,9 @@ in vec3 position;
 in vec3 normal;
 
 out vec3 Normal;
-out vec3 LightDir;
-out float Distance;
+//out vec3 LightDir;
+//out float Distance;
+out vec4 WPosition;
 
 uniform vec3 lightPosition;
 uniform mat4 cam_projMatrix;
@@ -28,7 +29,5 @@ void main()
 	Normal = normalize(worldNormal.xyz);
 
 	//Compute LightDir and Distance in world base
-	vec4 modPosition = vec4(position, 1.0) * mod_WMatrix;
-	LightDir =  normalize(lightPosition - modPosition.xyz);
-	Distance = distance(lightPosition, modPosition.xyz);
+	WPosition = mod_WMatrix * vec4(position, 1.0);
 }
