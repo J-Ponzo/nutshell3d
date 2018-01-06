@@ -12,11 +12,11 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class MutableMeshDef implements IMeshDef {
 	private String meshPath;
-	private float[][] posTable;
-	private float[][] colTable;
-	private float[][] offTable;
-	private float[][] norTable;
-	private int[][] idxTable;
+	private float[][] posTable = new float[0][3];
+	private float[][] colTable = new float[0][3];
+	private float[][] offTable = new float[0][3];
+	private float[][] norTable = new float[0][3];
+	private int[][] idxTable = new int[0][3];
 
 	private enum DataType{
 		Position,
@@ -52,7 +52,7 @@ public class MutableMeshDef implements IMeshDef {
 		int p1 = idxTable[faceInd][0];
 		int p2 = idxTable[faceInd][1];
 		int p3 = idxTable[faceInd][2];
-		
+
 		//Remove face
 		int[][] newIdxTable = new int[idxTable.length - 1][3];
 		int ind = 0;
@@ -70,7 +70,7 @@ public class MutableMeshDef implements IMeshDef {
 		}
 		idxTable = newIdxTable;
 	}
-	
+
 	/**
 	 * Normalize positions on a unit cube 
 	 */
@@ -138,7 +138,7 @@ public class MutableMeshDef implements IMeshDef {
 			posTable[i][2] *= scalFactor;
 		}
 	}
-	
+
 	/**
 	 * Generate position normals from topology
 	 */
@@ -149,18 +149,18 @@ public class MutableMeshDef implements IMeshDef {
 			int p1 = idxTable[i][0];
 			int p2 = idxTable[i][1];
 			int p3 = idxTable[i][2];
-			
+
 			Vec3 v1 = new Vec3(posTable[p1][0], posTable[p1][1], posTable[p1][2]);
 			Vec3 v2 = new Vec3(posTable[p2][0], posTable[p2][1], posTable[p2][2]);
 			Vec3 v3 = new Vec3(posTable[p3][0], posTable[p3][1], posTable[p3][2]);
-			
+
 			Vec3 v1v2 = v2.subtract(v1);
 			Vec3 v1v3 = v3.subtract(v1);
-			
+
 			Vec3 n = v1v2.cross(v1v3).getUnitVector();
 			trisNor[i] = n;
 		}
-		
+
 		//Init position adjacences table (pos => faces)
 		List<Integer>[] posAdj = new List[posTable.length];
 		for (int i = 0; i < posTable.length; i++) {
@@ -170,12 +170,12 @@ public class MutableMeshDef implements IMeshDef {
 			int p1 = idxTable[i][0];
 			int p2 = idxTable[i][1];
 			int p3 = idxTable[i][2];
-			
+
 			posAdj[p1].add(i);
 			posAdj[p2].add(i);
 			posAdj[p3].add(i);
 		}
-		
+
 		//Compute normals
 		norTable = new float[posTable.length][3];
 		for (int i = 0; i < posTable.length; i++) {
@@ -536,7 +536,7 @@ public class MutableMeshDef implements IMeshDef {
 			idxTable[i][1] = (int) Float.parseFloat(tokens[2]);
 			idxTable[i][2] = (int) Float.parseFloat(tokens[3]);
 		}
-		
+
 		//Generate normals
 		generateNormals();
 	}
@@ -712,5 +712,175 @@ public class MutableMeshDef implements IMeshDef {
 	@Override
 	public float[][] getNorTable() {
 		return norTable;
+	}
+
+	public void addFace(float[] v1, float[] v2, float[] v3, boolean merge, boolean bothFaces) {
+		int nbMiss = 0;
+		int ind1 = -1;
+		int ind2 = -1;
+		int ind3 = -1;
+		if (merge) {
+			//Look for vertices
+			ind1 = findIndex(v1);
+			if (ind1 == -1) {
+				nbMiss++;
+			}
+			ind2 = findIndex(v2);
+			if (ind2 == -1) {
+				nbMiss++;
+			}
+			ind3 = findIndex(v3);
+			if (ind3 == -1) {
+				nbMiss++;
+			}
+		} else {
+			nbMiss = 3;
+		}
+
+		//Comput Normal
+		Vec3 a = new Vec3(v1[0], v1[1], v1[2]);
+		Vec3 b = new Vec3(v2[0], v2[1], v2[2]);
+		Vec3 c = new Vec3(v3[0], v3[1], v3[2]);
+		Vec3 ab = b.subtract(a);
+		Vec3 ac = c.subtract(a);
+		Vec3 n = ac.cross(ab).getUnitVector();
+		
+		//Add missing vertices & normals
+		if (nbMiss > 0) {
+			int nextInd = posTable.length;
+			if (bothFaces) {
+				extendsVertexData(nbMiss * 2);
+			} else {
+				extendsVertexData(nbMiss);
+			}
+			if (ind1 == -1) {
+				ind1 = nextInd++;
+				posTable[ind1][0] = v1[0];
+				posTable[ind1][1] = v1[1];
+				posTable[ind1][2] = v1[2];
+				
+				norTable[ind1][0] = n.getX();
+				norTable[ind1][1] = n.getY();
+				norTable[ind1][2] = n.getZ();
+				
+				if (bothFaces) {
+					ind1 = nextInd++;
+					posTable[ind1][0] = v1[0];
+					posTable[ind1][1] = v1[1];
+					posTable[ind1][2] = v1[2];
+					
+					norTable[ind1][0] = -n.getX();
+					norTable[ind1][1] = -n.getY();
+					norTable[ind1][2] = -n.getZ();
+				}
+			}
+			if (ind2 == -1) {
+				ind2 = nextInd++;
+				posTable[ind2][0] = v2[0];
+				posTable[ind2][1] = v2[1];
+				posTable[ind2][2] = v2[2];
+				
+				norTable[ind2][0] = n.getX();
+				norTable[ind2][1] = n.getY();
+				norTable[ind2][2] = n.getZ();
+				
+				if (bothFaces) {
+					ind2 = nextInd++;
+					posTable[ind2][0] = v2[0];
+					posTable[ind2][1] = v2[1];
+					posTable[ind2][2] = v2[2];
+					
+					norTable[ind2][0] = -n.getX();
+					norTable[ind2][1] = -n.getY();
+					norTable[ind2][2] = -n.getZ();
+				}
+			}
+			if (ind3 == -1) {
+				ind3 = nextInd++;
+				posTable[ind3][0] = v3[0];
+				posTable[ind3][1] = v3[1];
+				posTable[ind3][2] = v3[2];
+				
+				norTable[ind3][0] = n.getX();
+				norTable[ind3][1] = n.getY();
+				norTable[ind3][2] = n.getZ();
+				
+				if (bothFaces) {
+					ind3 = nextInd++;
+					posTable[ind3][0] = v3[0];
+					posTable[ind3][1] = v3[1];
+					posTable[ind3][2] = v3[2];
+					
+					norTable[ind3][0] = -n.getX();
+					norTable[ind3][1] = -n.getY();
+					norTable[ind3][2] = -n.getZ();
+				}
+			}
+		}
+
+		//Add face
+		int ind = idxTable.length;
+		if (!bothFaces) {
+			extendsElementData(1);
+			idxTable[ind][0] = ind1;
+			idxTable[ind][1] = ind2;
+			idxTable[ind][2] = ind3;
+		} else {
+			extendsElementData(2);
+			idxTable[ind][0] = ind1 - 1;
+			idxTable[ind][1] = ind2 - 1;
+			idxTable[ind][2] = ind3 - 1;
+			idxTable[ind + 1][0] = ind1;
+			idxTable[ind + 1][1] = ind2;
+			idxTable[ind + 1][2] = ind3;
+		}
+	}
+
+	private void extendsElementData(int nb) {
+		int[][] oldIdxTable = idxTable;
+		idxTable = new int[oldIdxTable.length + nb][3];
+		for (int i = 0; i < oldIdxTable.length; i++) {
+			idxTable[i][0] = oldIdxTable[i][0];
+			idxTable[i][1] = oldIdxTable[i][1];
+			idxTable[i][2] = oldIdxTable[i][2];
+		}
+	}
+
+	private void extendsVertexData(int nb) {
+		float[][] oldPosTable = posTable;
+		posTable = new float[oldPosTable.length + nb][3];
+		for (int i = 0; i < oldPosTable.length; i++) {
+			posTable[i][0] = oldPosTable[i][0];
+			posTable[i][1] = oldPosTable[i][1];
+			posTable[i][2] = oldPosTable[i][2];
+		}
+		
+		float[][] oldNorTable = norTable;
+		norTable = new float[oldNorTable.length + nb][3];
+		for (int i = 0; i < oldNorTable.length; i++) {
+			norTable[i][0] = oldNorTable[i][0];
+			norTable[i][1] = oldNorTable[i][1];
+			norTable[i][2] = oldNorTable[i][2];
+		}
+	}
+
+	private int findIndex(float[] v) {
+		int ind = -1;
+		for (int i = 0; i < posTable.length; i++) {
+			if (posTable[i][0] == v[0]
+					&& posTable[i][1] == v[1]
+							&& posTable[i][2] == v[2]) {
+				return i;
+			}
+		}
+		return ind;
+	}
+
+	public void clear() {
+		posTable = new float[0][3];
+		colTable = new float[0][3];
+		offTable = new float[0][3];
+		norTable = new float[0][3];
+		idxTable = new int[0][3];
 	}
 }

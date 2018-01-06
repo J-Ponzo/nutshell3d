@@ -12,9 +12,13 @@ public interface ICurve extends IComponent {
 
 	void setControlPts(List<Vec3> controlPts);
 
-	IMaterial getMaterial();
+	IMaterial getPointsMaterial();
+	
+	IMaterial getControlMaterial();
 
-	void setMaterial(IMaterial material);
+	void setPointsMaterial(IMaterial material);
+	
+	void setControlMaterial(IMaterial material);
 
 	float[][] getControlPtsTable();
 

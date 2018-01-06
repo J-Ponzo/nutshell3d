@@ -217,11 +217,16 @@ public class MGTP5Ex2App {
 		curve.getControlPts().add(new Vec3(2f, -2f, 0f));
 		curve.setDiscrtisation(10);
 		curve.updateFromControl();
-		IMaterial curvMat = MaterialManager.getInstance().createMaterial(
+		IMaterial ptsMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		curvMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
-		curve.setMaterial(curvMat);
+		ptsMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
+		IMaterial ctrlMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		ctrlMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
+		curve.setPointsMaterial(ptsMat);
+		curve.setControlMaterial(ctrlMat);
 		rootEntity.addChild(curveEntity);
 		new AbstractUpdator(curveEntity) {
 			public int selectedPt = 0;

@@ -1,4 +1,4 @@
-package fr.jponzo.gamagora.modelgeo.tp5;
+package fr.jponzo.gamagora.modelgeo.tpSurf;
 
 import java.awt.Color;
 import java.awt.Frame;
@@ -12,6 +12,9 @@ import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.awt.GLCanvas;
 
+import fr.jponzo.gamagora.modelgeo.tp4.MutableMeshDef;
+import fr.jponzo.gamagora.modelgeo.tp5.CurveBezier;
+import fr.jponzo.gamagora.modelgeo.tp5.ICurve;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
 import fr.jponzo.gamagora.nutshell3d.input.KeyCode;
 import fr.jponzo.gamagora.nutshell3d.material.impl.MaterialManager;
@@ -25,24 +28,25 @@ import fr.jponzo.gamagora.nutshell3d.scene.impl.Entity;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Light;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Mesh;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.MeshDef;
-import fr.jponzo.gamagora.nutshell3d.scene.impl.Mirror;
 import fr.jponzo.gamagora.nutshell3d.scene.impl.Transform;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ICamera;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ILight;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMesh;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMeshDef;
-import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IMirror;
 import fr.jponzo.gamagora.nutshell3d.scene.interfaces.ITransform;
 import fr.jponzo.gamagora.nutshell3d.utils.io.IOUtils;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
-public class MGTP5Ex1App {
+public class MGTPSurfEx3App {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
+	private static CurveBezier curve1;
+	private static CurveBezier curve2;
+	private static CurveBezier curCurvEdit;
 
 	public static void main(String[] args) throws InterruptedException, OperationNotSupportedException {
 
@@ -192,13 +196,13 @@ public class MGTP5Ex1App {
 		//Create Light
 		IEntity lightEntity = new Entity();
 		transform = new Transform(lightEntity);
-		transform.setLocalTranslate(Matrices.translation(2f, 2f, -2f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, 0f));
 		ILight light = new Light(lightEntity);
 		light.setAlbedo(
 				new Color(255, 255, 255, 255)
 				);
-		light.setIntensity(10f);
-		rootEntity.addChild(lightEntity);
+		light.setIntensity(5f);
+		cameraEntity.addChild(lightEntity);
 
 		createCurves(rootEntity);
 		createRoom(rootEntity);
@@ -206,15 +210,17 @@ public class MGTP5Ex1App {
 
 	private static void createCurves(IEntity rootEntity) throws OperationNotSupportedException {
 		ITransform transform;
-		IEntity curveEntity = new Entity();
-		transform = new Transform(curveEntity);
-		CurveHermite curve = new CurveHermite(curveEntity);
-		curve.setP0(new Vec3(-2f, -2f, 0f));
-		curve.setP1(new Vec3(2f, -2f, 0f));
-		curve.setV0(new Vec3(-1f, 3f, 0f));
-		curve.setV1(new Vec3(1f, -3f, 0f));
-		curve.setDiscrtisation(10);
-		curve.updateFromControl();
+
+		IEntity curve1Entity = new Entity();
+		curCurvEdit = curve1;
+		transform = new Transform(curve1Entity);
+		curve1 = new CurveBezier(curve1Entity);
+		curve1.getControlPts().add(new Vec3(-2f, -2f, 0f));
+		curve1.getControlPts().add(new Vec3(-1f, 1f, 0f));
+		curve1.getControlPts().add(new Vec3(1f, 1f, 0f));
+		curve1.getControlPts().add(new Vec3(2f, -2f, 0f));
+		curve1.setDiscrtisation(10);
+		curve1.updateFromControl();
 		IMaterial ptsMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
@@ -223,10 +229,10 @@ public class MGTP5Ex1App {
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		ctrlMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
-		curve.setPointsMaterial(ptsMat);
-		curve.setControlMaterial(ctrlMat);
-		rootEntity.addChild(curveEntity);
-		new AbstractUpdator(curveEntity) {
+		curve1.setPointsMaterial(ptsMat);
+		curve1.setControlMaterial(ctrlMat);
+		rootEntity.addChild(curve1Entity);
+		new AbstractUpdator(curve1Entity) {
 			public int selectedPt = 0;
 			private ICurve curve;
 			private float offset = 0.1f;
@@ -235,6 +241,10 @@ public class MGTP5Ex1App {
 			public void update(long deltaTime) {
 				Vec3 controlPt = curve.getControlPts().get(selectedPt);
 
+				if (curCurvEdit != curve) {
+					return;
+				}
+				
 				//FWD
 				if (InputManager.getInstance().getKeyDown(KeyCode.I)) {
 					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY(), controlPt.getZ() + offset);
@@ -283,16 +293,85 @@ public class MGTP5Ex1App {
 						selectedPt -= 1;
 					}
 				}
+			}
+			
+			@Override
+			public void init() {
+				curve = entity.getCurves().get(0);
+			}
+		};
 
-				//Disc
-				if (InputManager.getInstance().getKeyDown(KeyCode.PageUp)) {
-					curve.setDiscrtisation(curve.getDiscrtisation() + 1);
+		IEntity curve2Entity = new Entity();
+		transform = new Transform(curve2Entity);
+		curve2 = new CurveBezier(curve2Entity);
+		curve2.getControlPts().add(new Vec3(-2f, -2f, 1f));
+		curve2.getControlPts().add(new Vec3(-1f, 1f, 1f));
+		curve2.getControlPts().add(new Vec3(1f, 1f, 1f));
+		curve2.getControlPts().add(new Vec3(2f, -2f, 1f));
+		curve2.setDiscrtisation(10);
+		curve2.updateFromControl();
+		curve2.setPointsMaterial(ptsMat);
+		curve2.setControlMaterial(ctrlMat);
+		rootEntity.addChild(curve2Entity);
+		new AbstractUpdator(curve2Entity) {
+			public int selectedPt = 0;
+			private ICurve curve;
+			private float offset = 0.1f;
+
+			@Override
+			public void update(long deltaTime) {
+				Vec3 controlPt = curve.getControlPts().get(selectedPt);
+
+				if (curCurvEdit != curve) {
+					return;
+				}
+				
+				//FWD
+				if (InputManager.getInstance().getKeyDown(KeyCode.I)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY(), controlPt.getZ() + offset);
+					curve.moveControlPoint(selectedPt, newControlePt);
 					curve.updateFromControl();
 				}
-				if (InputManager.getInstance().getKeyDown(KeyCode.PageDown)) {
-					if (curve.getDiscrtisation() > 0) {
-						curve.setDiscrtisation(curve.getDiscrtisation() - 1);
-						curve.updateFromControl();
+				//BCK
+				if (InputManager.getInstance().getKeyDown(KeyCode.K)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY(), controlPt.getZ() - offset);
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//LEFT
+				if (InputManager.getInstance().getKeyDown(KeyCode.J)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX() - offset, controlPt.getY(), controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//RIGHT
+				if (InputManager.getInstance().getKeyDown(KeyCode.L)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX() + offset, controlPt.getY(), controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//UP
+				if (InputManager.getInstance().getKeyDown(KeyCode.P)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY() + offset, controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//DOWN
+				if (InputManager.getInstance().getKeyDown(KeyCode.M)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY() - offset, controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+
+				//Select Ptc
+				if (InputManager.getInstance().getKeyDown(KeyCode.W)) {
+					if (selectedPt < curve.getControlPts().size() - 1) {
+						selectedPt += 1;
+					}
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.X)) {
+					if (selectedPt > 0) {
+						selectedPt -= 1;
 					}
 				}
 			}
@@ -302,6 +381,70 @@ public class MGTP5Ex1App {
 				curve = entity.getCurves().get(0);
 			}
 		};
+		
+		IEntity surfaceEntity = new Entity();
+		transform = new Transform(surfaceEntity);
+		MutableMeshDef surfDef = new MutableMeshDef();
+		createSurfFromCurves(surfDef, curve1, curve2);
+		IMesh surfMesh = new Mesh(surfaceEntity, surfDef);
+		IMaterial meshMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.frag");
+		meshMat.setVec3Param("mat_diffuseColor", 0.5f, 0.5f, 0.5f);
+		surfMesh.setMaterial(meshMat);
+		rootEntity.addChild(surfaceEntity);
+		new AbstractUpdator(surfaceEntity) {
+			MutableMeshDef surfDef;
+			
+			@Override
+			public void update(long deltaTime) {
+				//Select curve
+				if (InputManager.getInstance().getKeyDown(KeyCode.C)) {
+					if (curCurvEdit == curve1) {
+						curCurvEdit = curve2;
+					} else {
+						curCurvEdit = curve1;
+					}
+				}
+				
+				//Disc
+				if (InputManager.getInstance().getKeyDown(KeyCode.PageUp)) {
+					curve1.setDiscrtisation(curve1.getDiscrtisation() + 1);
+					curve1.updateFromControl();
+					curve2.setDiscrtisation(curve2.getDiscrtisation() + 1);
+					curve2.updateFromControl();
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.PageDown)) {
+					if (curve1.getDiscrtisation() > 0) {
+						curve1.setDiscrtisation(curve1.getDiscrtisation() - 1);
+						curve1.updateFromControl();
+					}
+					if (curve2.getDiscrtisation() > 0) {
+						curve2.setDiscrtisation(curve2.getDiscrtisation() - 1);
+						curve2.updateFromControl();
+					}
+				}
+				
+				createSurfFromCurves(surfDef, curve1, curve2);
+			}
+			
+			@Override
+			public void init() {
+				surfDef = (MutableMeshDef) entity.getMeshes().get(0).getMeshDef();
+			}
+		};
+	}
+
+	private static void createSurfFromCurves(MutableMeshDef surfDef, ICurve c1, ICurve c2) {	
+		surfDef.clear();
+		for (int i = 0; i < c1.getPtsTable().length - 1; i++) {
+			float[] v1 = c1.getPtsTable()[i];
+			float[] v2 = c1.getPtsTable()[i + 1];
+			float[] v3 = c2.getPtsTable()[i + 1];
+			float[] v4 = c2.getPtsTable()[i];
+			surfDef.addFace(v1, v2, v3, false, false);
+			surfDef.addFace(v1, v3, v4, false, false);
+		}
 	}
 
 	private static void createRoom(IEntity rootEntity) throws OperationNotSupportedException {
@@ -398,13 +541,5 @@ public class MGTP5Ex1App {
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
 		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
 		rWallMesh.setMaterial(rWallMat);
-
-		//IMirror mirror = null;
-		//		mirror = new Mirror(floorEntity);
-		//		mirror = new Mirror(roofEntity);
-		//		mirror = new Mirror(lWallEntity);
-		//		mirror = new Mirror(rWallEntity);
-		//mirror = new Mirror(fWallEntity);
-		//		mirror = new Mirror(bWallEntity);
 	}
 }

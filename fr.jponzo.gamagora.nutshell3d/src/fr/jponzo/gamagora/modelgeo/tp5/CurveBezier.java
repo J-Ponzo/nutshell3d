@@ -15,7 +15,8 @@ public class CurveBezier extends AbstractComponent implements ICurve {
 	private List<Vec3> points = new ArrayList<Vec3>();
 	private float discrtisation;
 	
-	IMaterial material;
+	IMaterial ptsMaterial;
+	IMaterial ctrlMaterial;
 	
 	public CurveBezier(IEntity entity) {
 		super(entity);
@@ -32,13 +33,23 @@ public class CurveBezier extends AbstractComponent implements ICurve {
 	}
 
 	@Override
-	public IMaterial getMaterial() {
-		return material;
+	public IMaterial getPointsMaterial() {
+		return ptsMaterial;
+	}
+	
+	@Override
+	public IMaterial getControlMaterial() {
+		return ctrlMaterial;
 	}
 
 	@Override
-	public void setMaterial(IMaterial material) {
-		this.material = material;
+	public void setPointsMaterial(IMaterial material) {
+		this.ptsMaterial = material;
+	}
+	
+	@Override
+	public void setControlMaterial(IMaterial material) {
+		this.ctrlMaterial = material;
 	}
 	
 	@Override

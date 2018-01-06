@@ -19,7 +19,8 @@ public class CurveHermite extends AbstractComponent implements ICurve {
 	private Vec3 v0;
 	private Vec3 v1;
 	
-	IMaterial material;
+	IMaterial ptsMaterial;
+	IMaterial ctrlMaterial;
 	
 	public CurveHermite(IEntity entity) {
 		super(entity);
@@ -36,13 +37,23 @@ public class CurveHermite extends AbstractComponent implements ICurve {
 	}
 
 	@Override
-	public IMaterial getMaterial() {
-		return material;
+	public IMaterial getPointsMaterial() {
+		return ptsMaterial;
+	}
+	
+	@Override
+	public IMaterial getControlMaterial() {
+		return ctrlMaterial;
 	}
 
 	@Override
-	public void setMaterial(IMaterial material) {
-		this.material = material;
+	public void setPointsMaterial(IMaterial material) {
+		this.ptsMaterial = material;
+	}
+	
+	@Override
+	public void setControlMaterial(IMaterial material) {
+		this.ctrlMaterial = material;
 	}
 	
 	@Override

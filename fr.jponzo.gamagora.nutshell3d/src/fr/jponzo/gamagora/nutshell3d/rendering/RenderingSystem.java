@@ -521,25 +521,10 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		for (IEntity entity : curveQueue) {
 			List<ICurve> curves = entity.getCurves();
 			for (ICurve curve : curves) {
-				if (curve != null && curve.getMaterial() != null) {
+				if (curve != null 
+						&& curve.getPointsMaterial() != null 
+						&& curve.getControlMaterial() != null) {
 					float[][] emptyTable = new float[0][0];
-					IMaterial curveMat = curve.getMaterial();
-
-					//Draw Controls
-					//Push Vertices
-					fillVBO(gl, 
-							curve.getControlPtsTable(), 
-							emptyTable, 
-							emptyTable, 
-							emptyTable);
-
-					//Set the Material Active
-					curveMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.2f);
-					setUpMaterial(gl, entity, curveMat, camera);
-
-					//Draw elements
-					gl.glDrawArrays(GL4.GL_LINE_STRIP, 0, curve.getControlPtsTable().length);
-
 					//Draw points
 					//Push Vertices
 					fillVBO(gl, 
@@ -549,11 +534,24 @@ public class RenderingSystem extends AbstractRenderingSystem {
 							emptyTable);
 
 					//Set the Material Active
-					curveMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.8f);
-					setUpMaterial(gl, entity, curveMat, camera);
+					setUpMaterial(gl, entity, curve.getPointsMaterial(), camera);
 
 					//Draw elements
 					gl.glDrawArrays(GL4.GL_LINE_STRIP, 0, curve.getPtsTable().length);
+					
+					//Draw Controls
+					//Push Vertices
+					fillVBO(gl, 
+							curve.getControlPtsTable(), 
+							emptyTable, 
+							emptyTable, 
+							emptyTable);
+
+					//Set the Material Active
+					setUpMaterial(gl, entity, curve.getControlMaterial(), camera);
+
+					//Draw elements
+					gl.glDrawArrays(GL4.GL_LINE_STRIP, 0, curve.getControlPtsTable().length);
 				}
 			}
 		}
