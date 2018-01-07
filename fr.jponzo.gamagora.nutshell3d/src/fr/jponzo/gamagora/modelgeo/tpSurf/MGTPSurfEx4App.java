@@ -7,6 +7,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Random;
 
 import javax.naming.OperationNotSupportedException;
 
@@ -44,7 +45,6 @@ public class MGTPSurfEx4App {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
-	private static float[][] pattern;
 	private static float circleRadius = 1;
 	private static int circleDisc = 10;
 	private static MutableMeshDef surfDef;
@@ -320,8 +320,7 @@ public class MGTPSurfEx4App {
 		IEntity surfaceEntity = new Entity();
 		transform = new Transform(surfaceEntity);
 		surfDef = new MutableMeshDef();
-		pattern = createCircle(circleRadius, circleDisc);
-		createSurfFromCurvePattern(surfDef, curve, pattern);
+		createSurfFromCurvePattern(surfDef, curve);
 		IMesh surfMesh = new Mesh(surfaceEntity, surfDef);
 		IMaterial meshMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.vert", 
@@ -355,10 +354,37 @@ public class MGTPSurfEx4App {
 	}
 
 	private static void updateSurf(MutableMeshDef surfDef, ICurve curve) {
-		pattern = createCircle(circleRadius, circleDisc);
-		createSurfFromCurvePattern(surfDef, curve, pattern);
+		createSurfFromCurvePattern(surfDef, curve);
 	}
-	
+
+
+	private static float[][] createCircle(float radius, int disc, Vec3 center, Vec3 tan) {
+		float[][] circle = new float[disc + 1][3];
+		Vec3 up = new Vec3(0f, 1f, 0f);
+		Vec3 a = up.cross(tan).getUnitVector();
+		Vec3 b = tan.cross(a).getUnitVector();
+		
+		float delta = (float) ((2 * Math.PI) / (float) disc);
+		float teta = 0;
+		for (int i = 0; i < disc; i++) {
+			float x = center.getX() + (float) (radius * Math.cos(teta) * a.getX()) + (float) (radius * Math.sin(teta) * b.getX());
+			float y = center.getY() + (float) (radius * Math.cos(teta) * a.getY()) + (float) (radius * Math.sin(teta) * b.getY());
+			float z = center.getZ() + (float) (radius * Math.cos(teta) * a.getZ()) + (float) (radius * Math.sin(teta) * b.getZ());
+
+			circle[i][0] = x;
+			circle[i][1] = y;
+			circle[i][2] = z;
+
+			teta += delta;
+		}
+
+		circle[disc][0] = circle[0][0];
+		circle[disc][1] = circle[0][1];
+		circle[disc][2] = circle[0][2];
+
+		return circle;
+	}
+
 	private static float[][] createCircle(float radius, int disc) {
 		float[][] circle = new float[disc + 1][3];
 
@@ -382,30 +408,38 @@ public class MGTPSurfEx4App {
 		return circle;
 	}
 
-	private static void createSurfFromCurvePattern(MutableMeshDef surfDef, ICurve curve, float[][] pattern) {	
+	private static void createSurfFromCurvePattern(MutableMeshDef surfDef, ICurve curve) {	
 		surfDef.clear();
-		for (int i = 0; i < curve.getPtsTable().length - 1; i++) {
-			for(int j = 0; j < pattern.length - 1; j++) {
-				float[] u1 = curve.getPtsTable()[i];
-				float[] u2 = curve.getPtsTable()[i + 1];
-				float[] c1 = pattern[j];
-				float[] c2 = pattern[j + 1];
 
-				Vec3 U1 = new Vec3(u1[0], u1[1], u1[2]);
-				Vec3 U2 = new Vec3(u2[0], u2[1], u2[2]);
+		for (int i = 0; i < curve.getPtsTable().length - 2; i++) {
+			float[] u1 = curve.getPtsTable()[i];
+			float[] u2 = curve.getPtsTable()[i + 1];
+			float[] u3 = curve.getPtsTable()[i + 2];
+			Vec3 U1 = new Vec3(u1[0], u1[1], u1[2]);
+			Vec3 U2 = new Vec3(u2[0], u2[1], u2[2]);
+			Vec3 U3 = new Vec3(u3[0], u3[1], u3[2]);
+			Vec3 tan1 = U2.subtract(U1).getUnitVector();
+			Vec3 tan2 = U3.subtract(U2).getUnitVector();
 
-				Vec3 C1 = new Vec3(c1[0], c1[1], c1[2]);
-				Vec3 C2 = new Vec3(c2[0], c2[1], c2[2]);
+			float[][] pattern1 = createCircle(circleRadius, circleDisc, U1, tan1);
+			float[][] pattern2 = createCircle(circleRadius, circleDisc, U2, tan2);
+			for(int j = 0; j < pattern1.length - 1; j++) {
+				float[] c11 = pattern1[j];
+				float[] c12 = pattern1[j + 1];
+				float[] c21 = pattern2[j];
+				float[] c22 = pattern2[j + 1];
 
-				Vec3 V1 = C1.add(U1);
-				Vec3 V2 = C1.add(U2);
-				Vec3 V3 = C2.add(U2);
-				Vec3 V4 = C2.add(U1);
 
-				float[] v1 = V1.getArray();
-				float[] v2 = V2.getArray();
-				float[] v3 = V3.getArray();
-				float[] v4 = V4.getArray();
+
+				Vec3 C11 = new Vec3(c11[0], c11[1], c11[2]);
+				Vec3 C12 = new Vec3(c12[0], c12[1], c12[2]);
+				Vec3 C21 = new Vec3(c21[0], c21[1], c21[2]);
+				Vec3 C22 = new Vec3(c22[0], c22[1], c22[2]);
+
+				float[] v2 = C11.getArray();
+				float[] v1 = C12.getArray();
+				float[] v4 = C22.getArray();
+				float[] v3 = C21.getArray();
 
 				surfDef.addFace(v1, v2, v3, false, false);
 				surfDef.addFace(v1, v3, v4, false, false);
