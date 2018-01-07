@@ -205,6 +205,26 @@ public class InputManager {
 			return KeyCode.PageUp;
 		case KeyEvent.VK_PAGE_DOWN:
 			return KeyCode.PageDown;
+		case KeyEvent.VK_NUMPAD0:
+			return KeyCode.Numpad0;
+		case KeyEvent.VK_NUMPAD1:
+			return KeyCode.Numpad1;
+		case KeyEvent.VK_NUMPAD2:
+			return KeyCode.Numpad2;
+		case KeyEvent.VK_NUMPAD3:
+			return KeyCode.Numpad3;
+		case KeyEvent.VK_NUMPAD4:
+			return KeyCode.Numpad4;
+		case KeyEvent.VK_NUMPAD5:
+			return KeyCode.Numpad5;
+		case KeyEvent.VK_NUMPAD6:
+			return KeyCode.Numpad6;
+		case KeyEvent.VK_NUMPAD7:
+			return KeyCode.Numpad7;
+		case KeyEvent.VK_NUMPAD8:
+			return KeyCode.Numpad8;
+		case KeyEvent.VK_NUMPAD9:
+			return KeyCode.Numpad9;
 		}
 		return null;
 	}

@@ -42,5 +42,15 @@ public enum KeyCode {
 		Mouse7,
 		Mouse8,
 		Mouse9,
-		Mouse10
-}
+		Mouse10,
+		Numpad0,
+		Numpad1,
+		Numpad2,
+		Numpad3,
+		Numpad4,
+		Numpad5,
+		Numpad6,
+		Numpad7,
+		Numpad8,
+		Numpad9,
+	}
