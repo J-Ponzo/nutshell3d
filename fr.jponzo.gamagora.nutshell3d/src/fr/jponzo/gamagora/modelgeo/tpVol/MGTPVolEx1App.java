@@ -118,9 +118,9 @@ public class MGTPVolEx1App {
 
 	private static void createVoxels(IEntity rootEntity) throws OperationNotSupportedException {
 		//Compute disc
-		discW = 1 / cubeSize;
-		discH = 1 / cubeSize;
-		discD = 1 / cubeSize;
+		discW = 1f / cubeSize;
+		discH = 1f / cubeSize;
+		discD = 1f / cubeSize;
 
 		//Create voxel space
 		initVoxGrid(spheres);
