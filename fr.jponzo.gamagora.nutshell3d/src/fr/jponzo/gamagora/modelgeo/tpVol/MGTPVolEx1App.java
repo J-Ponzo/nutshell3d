@@ -7,13 +7,15 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.awt.GLCanvas;
 
 import fr.jponzo.gamagora.modelgeo.MutableMeshDef;
-import fr.jponzo.gamagora.modelgeo.tp5.CurveBezier;
+import fr.jponzo.gamagora.modelgeo.Sphere;
 import fr.jponzo.gamagora.modelgeo.tp5.ICurve;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
 import fr.jponzo.gamagora.nutshell3d.input.KeyCode;
@@ -44,9 +46,21 @@ public class MGTPVolEx1App {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
-	private static CurveBezier curve1;
-	private static CurveBezier curve2;
-	private static CurveBezier curCurvEdit;
+
+	private static float cubeSize = 1;
+	private static float discW = 1f;
+	private static float discH = 1f;
+	private static float discD = 1f;
+	private static int xMinBound = -10;
+	private static int xMaxBound = 10;
+	private static int yMinBound = -10;
+	private static int yMaxBound = 10;
+	private static int zMinBound = -10;
+	private static int zMaxBound = 10;
+	private static float[][][] voxGrid;
+	private static List<Sphere> spheres = new ArrayList<Sphere>();
+	private static int selectedSphere = 0;
+	private static boolean isInterOp = false;
 
 	public static void main(String[] args) throws InterruptedException, OperationNotSupportedException {
 
@@ -95,9 +109,154 @@ public class MGTPVolEx1App {
 
 		SceneManager.getInstance().initPass();
 
+		RenderingSystem.getInstance().setBatchDrawCalls(false);
+
 		RuntimeSystem.getInstance().start();
 
 		RuntimeSystem.getInstance().play();
+	}
+
+	private static void createVoxels(IEntity rootEntity) throws OperationNotSupportedException {
+		//Compute disc
+		discW = 1 / cubeSize;
+		discH = 1 / cubeSize;
+		discD = 1 / cubeSize;
+
+		//Create voxel space
+		initVoxGrid(spheres);
+
+		//Create meshes from voxel space
+		IEntity cubesRoot = cubesFromGrid();
+		if (rootEntity.getChildsCount() > 1) {
+			rootEntity.removeChild(1);
+		}
+		rootEntity.addChild(cubesRoot);
+	}
+
+	private static IEntity cubesFromGrid() throws OperationNotSupportedException {
+		ITransform transform;
+
+		IEntity cubesRoot = new Entity();
+		new Transform(cubesRoot);
+
+		IMeshDef cubeMeshDef = new MeshDef();
+		cubeMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\Cube.obj");
+		cubeMeshDef.load();
+
+		IMaterial meshMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.frag");
+		meshMat.setVec3Param("mat_diffuseColor", 0.5f, 0.5f, 0.5f);
+
+		int w = (int) ((xMaxBound - xMinBound) * discW);
+		int h = (int) ((yMaxBound - yMinBound) * discH);
+		int d = (int) ((zMaxBound - zMinBound) * discD);
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				for (int k = 0; k < d; k++) {
+					if (voxGrid[i][j][k] > 0) {
+						if (i == 0 || j == 0 || k == 0 || i == w - 1 || j == h - 1 || k == d - 1 
+								|| !(voxGrid[i + 1][j][k] > 0 
+										&& voxGrid[i - 1][j][k] > 0 
+										&& voxGrid[i][j + 1][k] > 0 
+										&& voxGrid[i][j - 1][k] > 0 
+										&& voxGrid[i][j][k + 1] > 0 
+										&& voxGrid[i][j][k - 1] > 0)) {
+							IEntity cubeEntity = new Entity();
+							transform = new Transform(cubeEntity);
+							transform.setLocalTranslate(Matrices.translation(
+									(float) i / (float) discW + xMinBound, 
+									(float) j / (float) discH + yMinBound, 
+									(float) k / (float) discD + zMinBound));
+							transform.setLocalScale(Matrices.scale(
+									1f / (float) discW, 1f / (float) discH, 1f / (float) discD));
+							IMesh cubeMesh = new Mesh(cubeEntity, cubeMeshDef);
+							cubesRoot.addChild(cubeEntity);
+							cubeMesh.setMaterial(meshMat);
+						}
+					}
+				}
+			}
+		}
+
+		return cubesRoot;
+	}
+
+	private static void initVoxGrid(List<Sphere> spheres) {
+		Sphere firstSphere = spheres.get(0);
+		xMinBound = (int) (firstSphere.getOrigin().getX() - firstSphere.getRadius()) - 1;
+		xMaxBound = (int) (firstSphere.getOrigin().getX() + firstSphere.getRadius()) + 1;
+		yMinBound = (int) (firstSphere.getOrigin().getY() - firstSphere.getRadius()) - 1;
+		yMaxBound = (int) (firstSphere.getOrigin().getY() + firstSphere.getRadius()) + 1;
+		zMinBound = (int) (firstSphere.getOrigin().getZ() - firstSphere.getRadius()) - 1;
+		zMaxBound = (int) (firstSphere.getOrigin().getZ() + firstSphere.getRadius()) + 1;
+		for (int i = 1; i < spheres.size(); i++) {
+			Sphere sphere = spheres.get(i);
+			int curXMinBound = (int) (sphere.getOrigin().getX() - firstSphere.getRadius()) - 1;
+			int curXMaxBound = (int) (sphere.getOrigin().getX() + firstSphere.getRadius()) + 1;
+			int curYMinBound = (int) (sphere.getOrigin().getY() - firstSphere.getRadius()) - 1;
+			int curYMaxBound = (int) (sphere.getOrigin().getY() + firstSphere.getRadius()) + 1;
+			int curZMinBound = (int) (sphere.getOrigin().getZ() - firstSphere.getRadius()) - 1;
+			int curZMaxBound = (int) (sphere.getOrigin().getZ() + firstSphere.getRadius()) + 1;
+
+			if (xMinBound > curXMinBound) {
+				xMinBound = curXMinBound;
+			}
+			if (xMaxBound < curXMaxBound) {
+				xMaxBound = curXMaxBound;
+			}
+			if (yMinBound > curYMinBound) {
+				yMinBound = curYMinBound;
+			}
+			if (yMaxBound < curYMaxBound) {
+				yMaxBound = curYMaxBound;
+			}
+			if (zMinBound > curZMinBound) {
+				zMinBound = curZMinBound;
+			}
+			if (zMaxBound < curZMaxBound) {
+				zMaxBound = curZMaxBound;
+			}
+		}
+
+		int w = (int) ((xMaxBound - xMinBound) * discW);
+		int h = (int) ((yMaxBound - yMinBound) * discH);
+		int d = (int) ((zMaxBound - zMinBound) * discD);
+		voxGrid = new float[w][h][d];
+		for (int i = 0; i < w; i++) {
+			for (int j = 0; j < h; j++) {
+				for (int k = 0; k < d; k++) {
+					if (isInterOp) {
+						voxGrid[i][j][k] = 0f;
+						for (Sphere sphere : spheres) {
+							Vec3 voxelPos = new Vec3((float) i / (float) discW + xMinBound, 
+									(float) j / (float) discH + yMinBound, 
+									(float) k / (float) discD + zMinBound);
+							float dist = voxelPos.subtract(sphere.getOrigin()).getLength();
+							if (dist < sphere.getRadius()) {
+								voxGrid[i][j][k]++;
+							}
+						}
+						if (voxGrid[i][j][k] == spheres.size()) {
+							voxGrid[i][j][k] = 1;
+						} else {
+							voxGrid[i][j][k] = 0;
+						}
+					} else {
+						voxGrid[i][j][k] = 0f;
+						for (Sphere sphere : spheres) {
+							Vec3 voxelPos = new Vec3((float) i / (float) discW + xMinBound, 
+									(float) j / (float) discH + yMinBound, 
+									(float) k / (float) discD + zMinBound);
+							float dist = voxelPos.subtract(sphere.getOrigin()).getLength();
+							if (dist < sphere.getRadius()) {
+								voxGrid[i][j][k] = 1f;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private static void configureScene() throws OperationNotSupportedException {
@@ -109,11 +268,11 @@ public class MGTPVolEx1App {
 		//Create Camera
 		IEntity cameraEntity = new Entity();
 		transform = new Transform(cameraEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0.5f, -3f));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, -30));
 		ICamera camera = new Camera(cameraEntity);
 		camera.setWidth(width);
 		camera.setHeight(height);
-		camera.setNear(1);
+		camera.setNear(0.001f);
 		camera.setFar(100);
 		camera.setFov(60f);
 		camera.setViewport(
@@ -126,11 +285,13 @@ public class MGTPVolEx1App {
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
-			private float moveSpeed = 2f;
+			private float moveSpeed = 10f;
 			private float rotSpeed = (float) Math.PI / 3f;
+			private float offset = 0.1f;
 
 			@Override
 			public void update(long deltaTime) {
+				//Move
 				ITransform transform = entity.getTransforms().get(0);
 				if (InputManager.getInstance().getKey(KeyCode.R)) {
 					Mat4 localTranslation = transform.getLocalTranslate();
@@ -169,6 +330,7 @@ public class MGTPVolEx1App {
 					transform.setLocalTranslate(offsetTranslation.multiply(localTranslation));
 				}
 
+				//Turn
 				Mat4 localRotation = transform.getLocalRotate();
 				Mat4 offsetHRotation = Mat4.MAT4_IDENTITY;
 				Mat4 offsetVRotation = Mat4.MAT4_IDENTITY;
@@ -185,6 +347,147 @@ public class MGTPVolEx1App {
 					offsetVRotation = Matrices.rotate(rotSpeed * ((float) deltaTime / 1000f), transform.getRight());
 				}
 				transform.setLocalRotate(offsetHRotation.multiply(offsetVRotation).multiply(localRotation));
+
+				//Discretisation
+				if (InputManager.getInstance().getKeyDown(KeyCode.PageUp)) {
+					cubeSize *= 1f / 0.9f;
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.PageDown)) {
+					cubeSize *= 0.9f;
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				//Select Sphere
+				if (InputManager.getInstance().getKeyDown(KeyCode.W)) {
+					if (selectedSphere < spheres.size() - 1) {
+						selectedSphere += 1;
+					}
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.X)) {
+					if (selectedSphere > 0) {
+						selectedSphere -= 1;
+					}
+				}
+
+				//Move sphere
+				//FWD
+				if (InputManager.getInstance().getKeyDown(KeyCode.I)) {
+					Sphere selected = spheres.get(selectedSphere);
+					Vec3 newOrigin = new Vec3(selected.getOrigin().getX(), selected.getOrigin().getY(), selected.getOrigin().getZ() + offset);
+					selected.setOrigin(newOrigin);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				//BCK
+				if (InputManager.getInstance().getKeyDown(KeyCode.K)) {
+					Sphere selected = spheres.get(selectedSphere);
+					Vec3 newOrigin = new Vec3(selected.getOrigin().getX(), selected.getOrigin().getY(), selected.getOrigin().getZ() - offset);
+					selected.setOrigin(newOrigin);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				//LEFT
+				if (InputManager.getInstance().getKeyDown(KeyCode.J)) {
+					Sphere selected = spheres.get(selectedSphere);
+					Vec3 newOrigin = new Vec3(selected.getOrigin().getX() - offset, selected.getOrigin().getY(), selected.getOrigin().getZ());
+					selected.setOrigin(newOrigin);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				//RIGHT
+				if (InputManager.getInstance().getKeyDown(KeyCode.L)) {
+					Sphere selected = spheres.get(selectedSphere);
+					Vec3 newOrigin = new Vec3(selected.getOrigin().getX() + offset, selected.getOrigin().getY(), selected.getOrigin().getZ());
+					selected.setOrigin(newOrigin);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				//UP
+				if (InputManager.getInstance().getKeyDown(KeyCode.P)) {
+					Sphere selected = spheres.get(selectedSphere);
+					Vec3 newOrigin = new Vec3(selected.getOrigin().getX(), selected.getOrigin().getY() + offset, selected.getOrigin().getZ());
+					selected.setOrigin(newOrigin);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				//DOWN
+				if (InputManager.getInstance().getKeyDown(KeyCode.M)) {
+					Sphere selected = spheres.get(selectedSphere);
+					Vec3 newOrigin = new Vec3(selected.getOrigin().getX(), selected.getOrigin().getY() - offset, selected.getOrigin().getZ());
+					selected.setOrigin(newOrigin);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				//SCALE SPHERE
+				if (InputManager.getInstance().getKeyDown(KeyCode.Y)) {
+					Sphere selected = spheres.get(selectedSphere);
+					selected.setRadius(selected.getRadius() + 0.1f);
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.H)) {
+					Sphere selected = spheres.get(selectedSphere);
+					if (selected.getRadius() > 0) {
+						selected.setRadius(selected.getRadius() - 0.1f);
+					}
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				//TOGGLE OPERATOR
+				if (InputManager.getInstance().getKeyDown(KeyCode.T)) {
+					isInterOp = !isInterOp;
+					try {
+						createVoxels(rootEntity);
+					} catch (OperationNotSupportedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
 			}
 
 			@Override
@@ -201,141 +504,15 @@ public class MGTPVolEx1App {
 		light.setAlbedo(
 				new Color(255, 255, 255, 255)
 				);
-		light.setIntensity(5f);
+		light.setIntensity(100f);
 		cameraEntity.addChild(lightEntity);
 
+		//Create spheres
+		Sphere s1 = new Sphere(new Vec3(2.0f, 0.0f, 0.0f), 3f);
+		spheres.add(s1);
+		Sphere s2 = new Sphere(new Vec3(-2.0f, 0.0f, 0.0f), 3f);
+		spheres.add(s2);
+
 		createVoxels(rootEntity);
-		createRoom(rootEntity);
-	}
-
-	private static void createVoxels(IEntity rootEntity) throws OperationNotSupportedException {
-		
-	}
-
-	private static void createSurfFromCurves(MutableMeshDef surfDef, ICurve c2, ICurve c1) {	
-		surfDef.clear();
-		Vec3 c10 = new Vec3(c1.getPtsTable()[0][0], c1.getPtsTable()[0][1], c1.getPtsTable()[0][2]);
-		for (int i = 0; i < c1.getPtsTable().length - 1; i++) {
-			for (int j = 0; j < c2.getPtsTable().length - 1; j++) {
-				float[] u1 = c1.getPtsTable()[i];
-				float[] u2 = c1.getPtsTable()[i + 1];
-				float[] v1 = c2.getPtsTable()[j];
-				float[] v2 = c2.getPtsTable()[j + 1];
-				
-				Vec3 U1 = new Vec3(u1[0], u1[1], u1[2]);
-				Vec3 U2 = new Vec3(u2[0], u2[1], u2[2]);
-				Vec3 V1 = new Vec3(v1[0], v1[1], v1[2]);
-				Vec3 V2 = new Vec3(v2[0], v2[1], v2[2]);
-				
-				Vec3 A = U1.add(V1).subtract(c10);
-				Vec3 B = U1.add(V2).subtract(c10);
-				Vec3 C = U2.add(V2).subtract(c10);
-				Vec3 D = U2.add(V1).subtract(c10);
-				
-				float[] a = A.getArray();
-				float[] b = B.getArray();
-				float[] c = C.getArray();
-				float[] d = D.getArray();
-				
-				surfDef.addFace(a, b, c, false, false);
-				surfDef.addFace(a, c, d, false, false);
-			}
-		}
-	}
-
-	private static void createRoom(IEntity rootEntity) throws OperationNotSupportedException {
-		ITransform transform;
-
-		//Create Room Pivot
-		IEntity roomrEntity = new Entity();
-		transform = new Transform(roomrEntity);
-		transform.setLocalTranslate(Matrices.translation(-1f, 1f, 1f));
-		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 4)));
-		rootEntity.addChild(roomrEntity);
-
-		//Create Floor
-		IEntity floorEntity = new Entity();
-		transform = new Transform(floorEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, -5f, 0f));
-		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMeshDef wallMeshDef = new MeshDef();
-		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
-		wallMeshDef.load();
-		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
-		roomrEntity.addChild(floorEntity);
-		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
-		floorMesh.setMaterial(floorMat);
-
-		//Create roof
-		IEntity roofEntity = new Entity();
-		transform = new Transform(roofEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 5f, 0f));
-		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
-		roomrEntity.addChild(roofEntity);
-		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
-		roofMesh.setMaterial(roofMat);
-
-		//Create front wall
-		IEntity fWallEntity = new Entity();
-		transform = new Transform(fWallEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 5f));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
-		roomrEntity.addChild(fWallEntity);
-		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
-		fWallMesh.setMaterial(fWallMat);
-
-		//Create back wall
-		IEntity bWallEntity = new Entity();
-		transform = new Transform(bWallEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, -5f));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
-		roomrEntity.addChild(bWallEntity);
-		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
-		bWallMesh.setMaterial(bWallMat);
-
-		//Create left wall
-		IEntity lWallEntity = new Entity();
-		transform = new Transform(lWallEntity);
-		transform.setLocalTranslate(Matrices.translation(5f, 0f, 0f));
-		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
-		roomrEntity.addChild(lWallEntity);
-		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
-		lWallMesh.setMaterial(lWallMat);
-
-		//Create right wall
-		IEntity rWallEntity = new Entity();
-		transform = new Transform(rWallEntity);
-		transform.setLocalTranslate(Matrices.translation(-5f, 0f, 0f));
-		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
-		roomrEntity.addChild(rWallEntity);
-		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
-		rWallMesh.setMaterial(rWallMat);
 	}
 }

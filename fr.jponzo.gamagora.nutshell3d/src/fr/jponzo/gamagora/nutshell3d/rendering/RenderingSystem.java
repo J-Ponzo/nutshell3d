@@ -77,13 +77,30 @@ public class RenderingSystem extends AbstractRenderingSystem {
 	private List<IEntity> curveQueue = new ArrayList<IEntity>();
 
 	private boolean debug = true;
+	private boolean batchDrawCalls = true;
 
 	private IEntity mirrorCamEntity = new Entity();
 
 	public GLCanvas getGlcanvas() {
 		return this.glcanvas;
 	}
+	
+	public boolean isDebug() {
+		return debug;
+	}
 
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
+	public boolean isBatchDrawCalls() {
+		return batchDrawCalls;
+	}
+
+	public void setBatchDrawCalls(boolean batchDrawCalls) {
+		this.batchDrawCalls = batchDrawCalls;
+	}
+	
 	public void renderPass(IEntity root) {
 		//Push entities in rendering queue
 		meshQueue.clear();
@@ -110,23 +127,25 @@ public class RenderingSystem extends AbstractRenderingSystem {
 				&& entity.getMirrors().size() == 0
 				&& entity.getPortals().size() == 0) {
 			meshQueue.add(entity);
-			Collections.sort(meshQueue, new Comparator<IEntity>() {
+			if (batchDrawCalls) {
+				Collections.sort(meshQueue, new Comparator<IEntity>() {
 
-				@Override
-				public int compare(IEntity o1, IEntity o2) {
-					String path1 = o1.getMeshes().get(0).getMeshDef().getPath();
-					String path2 = o1.getMeshes().get(0).getMeshDef().getPath();
-					int hash1 = path1.hashCode();
-					int hash2 = path2.hashCode();
-					if (hash1 > hash2) {
-						return 1;
-					} else if (hash1 < hash2) {
-						return -1;
-					} else {
-						return 0;
+					@Override
+					public int compare(IEntity o1, IEntity o2) {
+						String path1 = o1.getMeshes().get(0).getMeshDef().getPath();
+						String path2 = o1.getMeshes().get(0).getMeshDef().getPath();
+						int hash1 = path1.hashCode();
+						int hash2 = path2.hashCode();
+						if (hash1 > hash2) {
+							return 1;
+						} else if (hash1 < hash2) {
+							return -1;
+						} else {
+							return 0;
+						}
 					}
-				}
-			});
+				});
+			}
 		}
 		if (entity.getLights().size() > 0) {
 			lightQueue.add(entity);
@@ -324,7 +343,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 		ITransform camTransform = cameraEntity.getTransforms().get(0);
 		ITransform portalCamTransform = mirrorCamEntity.getTransforms().get(0);
 		portalCamTransform.setWorldTransform(portal.getViewMatrix(camTransform.getWorldTransform()));
-		
+
 		//Set mirror material
 		portalCam.setMaterial(portal.getMaterial());
 
@@ -376,7 +395,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 					//Push Elements
 					fillEBO(gl, mesh.getMeshDef().getIdxTable());
-					
+
 					loadedMeshPath = mesh.getMeshDef().getPath();
 				}
 
@@ -538,7 +557,7 @@ public class RenderingSystem extends AbstractRenderingSystem {
 
 					//Draw elements
 					gl.glDrawArrays(GL4.GL_LINE_STRIP, 0, curve.getPtsTable().length);
-					
+
 					//Draw Controls
 					//Push Vertices
 					fillVBO(gl, 
