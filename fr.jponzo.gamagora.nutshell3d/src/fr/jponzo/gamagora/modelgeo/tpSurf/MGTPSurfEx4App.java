@@ -13,7 +13,7 @@ import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.awt.GLCanvas;
 
-import fr.jponzo.gamagora.modelgeo.tp4.MutableMeshDef;
+import fr.jponzo.gamagora.modelgeo.MutableMeshDef;
 import fr.jponzo.gamagora.modelgeo.tp5.CurveBezier;
 import fr.jponzo.gamagora.modelgeo.tp5.ICurve;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;

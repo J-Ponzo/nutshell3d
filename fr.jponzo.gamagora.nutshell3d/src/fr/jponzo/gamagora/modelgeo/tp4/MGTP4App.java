@@ -19,6 +19,7 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 
+import fr.jponzo.gamagora.modelgeo.MutableMeshDef;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
 import fr.jponzo.gamagora.nutshell3d.input.KeyCode;
 import fr.jponzo.gamagora.nutshell3d.material.impl.MaterialManager;
