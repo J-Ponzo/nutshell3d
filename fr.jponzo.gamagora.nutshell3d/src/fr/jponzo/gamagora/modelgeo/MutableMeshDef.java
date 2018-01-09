@@ -12,11 +12,11 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class MutableMeshDef implements IMeshDef {
 	private String meshPath;
-	private float[][] posTable = new float[0][3];
-	private float[][] colTable = new float[0][3];
-	private float[][] offTable = new float[0][3];
-	private float[][] norTable = new float[0][3];
-	private int[][] idxTable = new int[0][3];
+	protected float[][] posTable = new float[0][3];
+	protected float[][] colTable = new float[0][3];
+	protected float[][] offTable = new float[0][3];
+	protected float[][] norTable = new float[0][3];
+	protected int[][] idxTable = new int[0][3];
 
 	private enum DataType{
 		Position,

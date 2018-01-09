@@ -7,16 +7,12 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.awt.GLCanvas;
 
-import fr.jponzo.gamagora.modelgeo.MutableMeshDef;
-import fr.jponzo.gamagora.modelgeo.Sphere;
-import fr.jponzo.gamagora.modelgeo.tp5.ICurve;
+import fr.jponzo.gamagora.modelgeo.LODMeshDef;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
 import fr.jponzo.gamagora.nutshell3d.input.KeyCode;
 import fr.jponzo.gamagora.nutshell3d.material.impl.MaterialManager;
@@ -46,10 +42,9 @@ public class MGTPSimApp {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
-
-	private static float gridDisc = 100f;
+	
 	private static float[][][] voxGrid;
-	private static MutableMeshDef meshDef;
+	private static LODMeshDef meshDef;
 	private static int selectedSphere = 0;
 	private static boolean isInterOp = false;
 
@@ -116,11 +111,11 @@ public class MGTPSimApp {
 		//Create Camera
 		IEntity cameraEntity = new Entity();
 		transform = new Transform(cameraEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, -30));
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, -3));
 		ICamera camera = new Camera(cameraEntity);
 		camera.setWidth(width);
 		camera.setHeight(height);
-		camera.setNear(0.001f);
+		camera.setNear(0.01f);
 		camera.setFar(100);
 		camera.setFov(60f);
 		camera.setViewport(
@@ -133,7 +128,7 @@ public class MGTPSimApp {
 		camera.setMaterial(camMat);
 		rootEntity.addChild(cameraEntity);
 		new AbstractUpdator(cameraEntity) {
-			private float moveSpeed = 10f;
+			private float moveSpeed = 2f;
 			private float rotSpeed = (float) Math.PI / 3f;
 
 			@Override
@@ -197,14 +192,14 @@ public class MGTPSimApp {
 
 				//Discretisation
 				if (InputManager.getInstance().getKeyDown(KeyCode.PageUp)) {
-					gridDisc++;
-					updateMesh();
+					if (meshDef.getDisc() < 64) {
+						meshDef.setDisc(meshDef.getDisc() * 2);
+					}
 				}
 				if (InputManager.getInstance().getKeyDown(KeyCode.PageDown)) {
-					if (gridDisc > 1) {
-						gridDisc--;
+					if (meshDef.getDisc() > 4) {
+						meshDef.setDisc(meshDef.getDisc() / 2);
 					}
-					updateMesh();
 				}
 			}
 
@@ -223,17 +218,122 @@ public class MGTPSimApp {
 		light.setAlbedo(
 				new Color(255, 255, 255, 255)
 				);
-		light.setIntensity(100f);
+		light.setIntensity(3f);
 		cameraEntity.addChild(lightEntity);
 
-		meshDef = new MutableMeshDef();
+		meshDef = new LODMeshDef();
 		meshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\bunny.off");
 		meshDef.load();
+
+		IMaterial meshMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.frag");
+		meshMat.setVec3Param("mat_diffuseColor", 0.5f, 0.5f, 0.5f);
 		
-		updateMesh();
+		//Create Triceratops Mesh
+		IEntity bunnyEntity = new Entity();
+		transform = new Transform(bunnyEntity);
+		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
+		IMesh triceratopsMesh = new Mesh(bunnyEntity, meshDef);
+		triceratopsMesh.setMaterial(meshMat);
+		rootEntity.addChild(bunnyEntity);
+
+		createRoom(rootEntity);
 	}
-	
-	private static void updateMesh() {
-		System.out.println("Update");
+
+	private static void createRoom(IEntity rootEntity) throws OperationNotSupportedException {
+		ITransform transform;
+
+		//Create Room Pivot
+		IEntity roomrEntity = new Entity();
+		transform = new Transform(roomrEntity);
+		transform.setLocalTranslate(Matrices.translation(-1f, 1f, 1f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 4)));
+		rootEntity.addChild(roomrEntity);
+
+		//Create Floor
+		IEntity floorEntity = new Entity();
+		transform = new Transform(floorEntity);
+		transform.setLocalTranslate(Matrices.translation(0f, -5f, 0f));
+		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
+		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		IMeshDef wallMeshDef = new MeshDef();
+		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
+		wallMeshDef.load();
+		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
+		roomrEntity.addChild(floorEntity);
+		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
+		floorMesh.setMaterial(floorMat);
+
+		//Create roof
+		IEntity roofEntity = new Entity();
+		transform = new Transform(roofEntity);
+		transform.setLocalTranslate(Matrices.translation(0f, 5f, 0f));
+		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
+		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
+		roomrEntity.addChild(roofEntity);
+		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
+		roofMesh.setMaterial(roofMat);
+
+		//Create front wall
+		IEntity fWallEntity = new Entity();
+		transform = new Transform(fWallEntity);
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, 5f));
+		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
+		roomrEntity.addChild(fWallEntity);
+		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
+		fWallMesh.setMaterial(fWallMat);
+
+		//Create back wall
+		IEntity bWallEntity = new Entity();
+		transform = new Transform(bWallEntity);
+		transform.setLocalTranslate(Matrices.translation(0f, 0f, -5f));
+		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
+		roomrEntity.addChild(bWallEntity);
+		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
+		bWallMesh.setMaterial(bWallMat);
+
+		//Create left wall
+		IEntity lWallEntity = new Entity();
+		transform = new Transform(lWallEntity);
+		transform.setLocalTranslate(Matrices.translation(5f, 0f, 0f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
+		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
+		roomrEntity.addChild(lWallEntity);
+		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
+		lWallMesh.setMaterial(lWallMat);
+
+		//Create right wall
+		IEntity rWallEntity = new Entity();
+		transform = new Transform(rWallEntity);
+		transform.setLocalTranslate(Matrices.translation(-5f, 0f, 0f));
+		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
+		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
+		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
+		roomrEntity.addChild(rWallEntity);
+		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
+				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
+		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
+		rWallMesh.setMaterial(rWallMat);
 	}
 }
