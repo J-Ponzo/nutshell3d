@@ -1,4 +1,4 @@
-package fr.jponzo.gamagora.modelgeo.tp4;
+package fr.jponzo.gamagora.modelgeo;
 
 import java.io.BufferedReader;
 import java.io.File;
