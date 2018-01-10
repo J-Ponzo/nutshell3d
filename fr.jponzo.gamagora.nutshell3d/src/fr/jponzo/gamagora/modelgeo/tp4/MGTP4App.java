@@ -277,8 +277,8 @@ public class MGTP4App {
 		transform = new Transform(bunnyEntity);
 		transform.setLocalTranslate(Matrices.translation(1f, 1f, -1f));
 		IMeshDef bunnyMeshDef = new MutableMeshDef();
-		bunnyMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\bunny.off");
-//		bunnyMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\brokenRabbit.off");
+//		bunnyMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\bunny.off");
+		bunnyMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\brokenRabbit.off");
 		bunnyMeshDef.load();
 		IMesh bunnyMesh = new Mesh(bunnyEntity, bunnyMeshDef);
 		rootEntity.addChild(bunnyEntity);

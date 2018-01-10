@@ -210,7 +210,7 @@ public class MGTP5Ex1App {
 		transform = new Transform(curveEntity);
 		CurveHermite curve = new CurveHermite(curveEntity);
 		curve.setP0(new Vec3(-2f, -2f, 0f));
-		curve.setP1(new Vec3(2f, -2f, 0f));
+		curve.setP1(new Vec3(2f, -3f, 0f));
 		curve.setV0(new Vec3(-1f, 3f, 0f));
 		curve.setV1(new Vec3(1f, -3f, 0f));
 		curve.setDiscrtisation(10);

@@ -11,9 +11,9 @@ import fr.jponzo.gamagora.nutshell3d.scene.interfaces.IEntity;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
 public class CurveBezier extends AbstractComponent implements ICurve {
-	private List<Vec3> controlPts = new ArrayList<Vec3>();
-	private List<Vec3> points = new ArrayList<Vec3>();
-	private float discrtisation;
+	protected List<Vec3> controlPts = new ArrayList<Vec3>();
+	protected List<Vec3> points = new ArrayList<Vec3>();
+	protected float discrtisation;
 	
 	IMaterial ptsMaterial;
 	IMaterial ctrlMaterial;

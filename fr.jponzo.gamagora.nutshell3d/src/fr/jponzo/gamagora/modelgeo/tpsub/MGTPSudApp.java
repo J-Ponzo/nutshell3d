@@ -1,4 +1,4 @@
-package fr.jponzo.gamagora.modelgeo.tpSim;
+package fr.jponzo.gamagora.modelgeo.tpsub;
 
 import java.awt.Color;
 import java.awt.Frame;
@@ -12,7 +12,8 @@ import javax.naming.OperationNotSupportedException;
 
 import com.jogamp.opengl.awt.GLCanvas;
 
-import fr.jponzo.gamagora.modelgeo.LODMeshDef;
+import fr.jponzo.gamagora.modelgeo.tp5.CurveBezier;
+import fr.jponzo.gamagora.modelgeo.tp5.ICurve;
 import fr.jponzo.gamagora.nutshell3d.input.InputManager;
 import fr.jponzo.gamagora.nutshell3d.input.KeyCode;
 import fr.jponzo.gamagora.nutshell3d.material.impl.MaterialManager;
@@ -38,15 +39,10 @@ import fr.jponzo.gamagora.nutshell3d.utils.jglm.Mat4;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Matrices;
 import fr.jponzo.gamagora.nutshell3d.utils.jglm.Vec3;
 
-public class MGTPSimApp {
+public class MGTPSudApp {
 	private static final String APP_NAME = "Nutshell3D App";
 	private static int width = 800;
 	private static int height = 600;
-	
-	private static float[][][] voxGrid;
-	private static LODMeshDef meshDef;
-	private static int selectedSphere = 0;
-	private static boolean isInterOp = false;
 
 	public static void main(String[] args) throws InterruptedException, OperationNotSupportedException {
 
@@ -95,8 +91,6 @@ public class MGTPSimApp {
 
 		SceneManager.getInstance().initPass();
 
-		RenderingSystem.getInstance().setBatchDrawCalls(false);
-
 		RuntimeSystem.getInstance().start();
 
 		RuntimeSystem.getInstance().play();
@@ -111,11 +105,11 @@ public class MGTPSimApp {
 		//Create Camera
 		IEntity cameraEntity = new Entity();
 		transform = new Transform(cameraEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, -3));
+		transform.setLocalTranslate(Matrices.translation(0f, -2f, -7f));
 		ICamera camera = new Camera(cameraEntity);
 		camera.setWidth(width);
 		camera.setHeight(height);
-		camera.setNear(0.01f);
+		camera.setNear(1);
 		camera.setFar(100);
 		camera.setFov(60f);
 		camera.setViewport(
@@ -133,7 +127,6 @@ public class MGTPSimApp {
 
 			@Override
 			public void update(long deltaTime) {
-				//Move
 				ITransform transform = entity.getTransforms().get(0);
 				if (InputManager.getInstance().getKey(KeyCode.R)) {
 					Mat4 localTranslation = transform.getLocalTranslate();
@@ -172,7 +165,6 @@ public class MGTPSimApp {
 					transform.setLocalTranslate(offsetTranslation.multiply(localTranslation));
 				}
 
-				//Turn
 				Mat4 localRotation = transform.getLocalRotate();
 				Mat4 offsetHRotation = Mat4.MAT4_IDENTITY;
 				Mat4 offsetVRotation = Mat4.MAT4_IDENTITY;
@@ -189,25 +181,7 @@ public class MGTPSimApp {
 					offsetVRotation = Matrices.rotate(rotSpeed * ((float) deltaTime / 1000f), transform.getRight());
 				}
 				transform.setLocalRotate(offsetHRotation.multiply(offsetVRotation).multiply(localRotation));
-
-				//Discretisation
-				if (InputManager.getInstance().getKeyDown(KeyCode.PageUp)) {
-					if (meshDef.getDisc() < 64) {
-						meshDef.setDisc(meshDef.getDisc() * 2);
-					}
-				}
-				if (InputManager.getInstance().getKeyDown(KeyCode.PageDown)) {
-					if (meshDef.getDisc() > 4) {
-						meshDef.setDisc(meshDef.getDisc() / 2);
-					}
-				}
-				
-				//Merge
-				if (InputManager.getInstance().getKeyDown(KeyCode.Numpad0)) {
-					meshDef.setMerge(!meshDef.isMerge());
-				}
 			}
-
 
 			@Override
 			public void init() {
@@ -218,127 +192,122 @@ public class MGTPSimApp {
 		//Create Light
 		IEntity lightEntity = new Entity();
 		transform = new Transform(lightEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 0f));
+		transform.setLocalTranslate(Matrices.translation(2f, 2f, -2f));
 		ILight light = new Light(lightEntity);
 		light.setAlbedo(
 				new Color(255, 255, 255, 255)
 				);
-		light.setIntensity(3f);
-		cameraEntity.addChild(lightEntity);
+		light.setIntensity(10f);
+		rootEntity.addChild(lightEntity);
 
-		meshDef = new LODMeshDef();
-		meshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\bunny.off");
-		meshDef.load();
-
-		IMaterial meshMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicLight.frag");
-		meshMat.setVec3Param("mat_diffuseColor", 0.5f, 0.5f, 0.5f);
-		
-		//Create Triceratops Mesh
-		IEntity bunnyEntity = new Entity();
-		transform = new Transform(bunnyEntity);
-		transform.setLocalTranslate(Matrices.translation(-1f, -1f, -1f));
-		IMesh triceratopsMesh = new Mesh(bunnyEntity, meshDef);
-		triceratopsMesh.setMaterial(meshMat);
-		rootEntity.addChild(bunnyEntity);
-
-		createRoom(rootEntity);
+		createCurves(rootEntity);
 	}
 
-	private static void createRoom(IEntity rootEntity) throws OperationNotSupportedException {
+	private static void createCurves(IEntity rootEntity) throws OperationNotSupportedException {
 		ITransform transform;
 
-		//Create Room Pivot
-		IEntity roomrEntity = new Entity();
-		transform = new Transform(roomrEntity);
-		transform.setLocalTranslate(Matrices.translation(-1f, 1f, 1f));
-		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 4)));
-		rootEntity.addChild(roomrEntity);
-
-		//Create Floor
-		IEntity floorEntity = new Entity();
-		transform = new Transform(floorEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, -5f, 0f));
-		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMeshDef wallMeshDef = new MeshDef();
-		wallMeshDef.setPath(IOUtils.RES_FOLDER_PATH + "meshes\\square.mesh.csv");
-		wallMeshDef.load();
-		IMesh floorMesh = new Mesh(floorEntity, wallMeshDef);
-		roomrEntity.addChild(floorEntity);
-		IMaterial floorMat = MaterialManager.getInstance().createMaterial(
+		IEntity curveEntity = new Entity();
+		transform = new Transform(curveEntity);
+		ICurve curve = new ChaikinCurve(curveEntity);
+		curve.getControlPts().add(new Vec3(-2f, -2f, 0f));
+		curve.getControlPts().add(new Vec3(-1f, 1f, 0f));
+		curve.getControlPts().add(new Vec3(0f, 0.5f, 0f));
+		curve.getControlPts().add(new Vec3(1f, 1f, 0f));
+		curve.getControlPts().add(new Vec3(2f, -2f, 0f));
+		curve.getControlPts().add(new Vec3(2f, -3f, 0f));
+		curve.getControlPts().add(new Vec3(-2f, -5f, 0f));
+		curve.getControlPts().add(new Vec3(-1f, -5f, 0f));
+		curve.getControlPts().add(new Vec3(2f, -0f, 0f));
+		curve.getControlPts().add(new Vec3(0f, -2f, 0f));
+		
+		curve.setDiscrtisation(0);
+		curve.updateFromControl();
+		IMaterial ptsMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		floorMat.setVec3Param("mat_color", 0.8f, 0.8f, 0.2f);
-		floorMesh.setMaterial(floorMat);
-
-		//Create roof
-		IEntity roofEntity = new Entity();
-		transform = new Transform(roofEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 5f, 0f));
-		transform.setLocalRotate(Matrices.xRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh roofMesh = new Mesh(roofEntity, wallMeshDef);
-		roomrEntity.addChild(roofEntity);
-		IMaterial roofMat = MaterialManager.getInstance().createMaterial(
+		ptsMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
+		IMaterial ctrlMat = MaterialManager.getInstance().createMaterial(
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
 				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		roofMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.8f);
-		roofMesh.setMaterial(roofMat);
+		ctrlMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
+		curve.setPointsMaterial(ptsMat);
+		curve.setControlMaterial(ctrlMat);
+		rootEntity.addChild(curveEntity);
+		new AbstractUpdator(curveEntity) {
+			public int selectedPt = 0;
+			private ICurve curve;
+			private float offset = 0.1f;
 
-		//Create front wall
-		IEntity fWallEntity = new Entity();
-		transform = new Transform(fWallEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, 5f));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh fWallMesh = new Mesh(fWallEntity, wallMeshDef);
-		roomrEntity.addChild(fWallEntity);
-		IMaterial fWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		fWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.8f);
-		fWallMesh.setMaterial(fWallMat);
+			@Override
+			public void update(long deltaTime) {
+				Vec3 controlPt = curve.getControlPts().get(selectedPt);
 
-		//Create back wall
-		IEntity bWallEntity = new Entity();
-		transform = new Transform(bWallEntity);
-		transform.setLocalTranslate(Matrices.translation(0f, 0f, -5f));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh bWallMesh = new Mesh(bWallEntity, wallMeshDef);
-		roomrEntity.addChild(bWallEntity);
-		IMaterial bWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		bWallMat.setVec3Param("mat_color", 0.8f, 0.2f, 0.2f);
-		bWallMesh.setMaterial(bWallMat);
+				//FWD
+				if (InputManager.getInstance().getKeyDown(KeyCode.I)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY(), controlPt.getZ() + offset);
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//BCK
+				if (InputManager.getInstance().getKeyDown(KeyCode.K)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY(), controlPt.getZ() - offset);
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//LEFT
+				if (InputManager.getInstance().getKeyDown(KeyCode.J)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX() - offset, controlPt.getY(), controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//RIGHT
+				if (InputManager.getInstance().getKeyDown(KeyCode.L)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX() + offset, controlPt.getY(), controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//UP
+				if (InputManager.getInstance().getKeyDown(KeyCode.P)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY() + offset, controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
+				//DOWN
+				if (InputManager.getInstance().getKeyDown(KeyCode.M)) {
+					Vec3 newControlePt = new Vec3(controlPt.getX(), controlPt.getY() - offset, controlPt.getZ());
+					curve.moveControlPoint(selectedPt, newControlePt);
+					curve.updateFromControl();
+				}
 
-		//Create left wall
-		IEntity lWallEntity = new Entity();
-		transform = new Transform(lWallEntity);
-		transform.setLocalTranslate(Matrices.translation(5f, 0f, 0f));
-		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh lWallMesh = new Mesh(lWallEntity, wallMeshDef);
-		roomrEntity.addChild(lWallEntity);
-		IMaterial lWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		lWallMat.setVec3Param("mat_color", 0.2f, 0.8f, 0.2f);
-		lWallMesh.setMaterial(lWallMat);
+				//Select Ptc
+				if (InputManager.getInstance().getKeyDown(KeyCode.W)) {
+					if (selectedPt < curve.getControlPts().size() - 1) {
+						selectedPt += 1;
+					}
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.X)) {
+					if (selectedPt > 0) {
+						selectedPt -= 1;
+					}
+				}
 
-		//Create right wall
-		IEntity rWallEntity = new Entity();
-		transform = new Transform(rWallEntity);
-		transform.setLocalTranslate(Matrices.translation(-5f, 0f, 0f));
-		transform.setLocalRotate(Matrices.yRotation((float) (Math.PI / 2)));
-		transform.setLocalScale(Matrices.scale(10f, 10f, 1f));
-		IMesh rWallMesh = new Mesh(rWallEntity, wallMeshDef);
-		roomrEntity.addChild(rWallEntity);
-		IMaterial rWallMat = MaterialManager.getInstance().createMaterial(
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.vert", 
-				IOUtils.RES_FOLDER_PATH + "shaders\\basicColor.frag");
-		rWallMat.setVec3Param("mat_color", 0.2f, 0.2f, 0.8f);
-		rWallMesh.setMaterial(rWallMat);
+				//Disc
+				if (InputManager.getInstance().getKeyDown(KeyCode.PageUp)) {
+					curve.setDiscrtisation(curve.getDiscrtisation() + 1);
+					curve.updateFromControl();
+				}
+				if (InputManager.getInstance().getKeyDown(KeyCode.PageDown)) {
+					if (curve.getDiscrtisation() > 0) {
+						curve.setDiscrtisation(curve.getDiscrtisation() - 1);
+						curve.updateFromControl();
+					}
+				}
+			}
+
+			@Override
+			public void init() {
+				curve = entity.getCurves().get(0);
+			}
+		};
 	}
 }

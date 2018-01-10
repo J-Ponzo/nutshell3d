@@ -156,7 +156,7 @@ public class MGTPVolEx3App {
 		for (int i = 0; i < w; i++) {
 			for (int j = 0; j < h; j++) {
 				for (int k = 0; k < d; k++) {
-					if (voxGrid[i][j][k] > seuil ) {System.out.println(voxGrid[i][j][k]);
+					if (voxGrid[i][j][k] > seuil ) {
 						if (i == 0 || j == 0 || k == 0 || i == w - 1 || j == h - 1 || k == d - 1 
 								|| !(voxGrid[i + 1][j][k] > seuil 
 										&& voxGrid[i - 1][j][k] > seuil 
@@ -233,7 +233,7 @@ public class MGTPVolEx3App {
 		new AbstractUpdator(cameraEntity) {
 			private float moveSpeed = 10f;
 			private float rotSpeed = (float) Math.PI / 3f;
-			private float offset = 0.1f;
+			private float offset = 1f;
 
 			@Override
 			public void update(long deltaTime) {
